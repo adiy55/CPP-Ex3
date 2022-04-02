@@ -14,8 +14,13 @@ namespace zich {
 
     public:
 
+        // https://www.reddit.com/r/cpp_questions/comments/swaxw2/passing_a_vector_to_constructor/
+        // https://stackoverflow.com/questions/46513507/c-copy-constructor-vs-move-constructor-for-stdvector
         Matrix(std::vector<double> matrix, int rows, int cols); // constructor
         // todo: default? destructor? copy constructor?
+
+//        Matrix(std::vector<double> &&matrix, int rows, int cols); // rvalue constructor
+
 
         Matrix operator-() const;
 
