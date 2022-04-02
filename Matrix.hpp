@@ -21,7 +21,6 @@ namespace zich {
 
 //        Matrix(std::vector<double> &&matrix, int rows, int cols); // rvalue constructor
 
-
         Matrix operator-() const;
 
         Matrix &operator*=(int scalar);
@@ -30,11 +29,46 @@ namespace zich {
 
         Matrix operator-(const Matrix &other) const;
 
+        Matrix operator+() const;
+
+        Matrix &operator+=(const Matrix &other);
+
+        Matrix &operator-=(const Matrix &other);
+
+        bool operator>(const Matrix &other) const;
+
+        bool operator>=(const Matrix &other) const;
+
+        bool operator<(const Matrix &other) const;
+
+        bool operator<=(const Matrix &other) const;
+
+        bool operator==(const Matrix &other) const;
+
+        bool operator!=(const Matrix &other) const;
+
+        // prefix (++i)
+
+        Matrix &operator++();
+
+        Matrix &operator--();
+
+        // postfix (i++)
+
+        Matrix operator++(int);
+
+        Matrix operator--(int);
+
+
+        Matrix operator*(const Matrix &other) const; // todo: throw exception if dimensions don't match
+
         // friend functions
 
         friend std::ostream &operator<<(std::ostream &out, const Matrix &matrix); // todo: does this need to be friend?
 
         friend Matrix operator*(int scalar, const Matrix &matrix); // todo: make const int?
+
+        friend std::istream &operator>>(std::istream &in, const auto); // todo: check type
 
     };
 }
