@@ -8,6 +8,7 @@
 namespace zich {
 
     class Matrix {
+    private:
         std::vector<double> _matrix;
         int _rows;
         int _cols;
@@ -16,10 +17,13 @@ namespace zich {
 
         // https://www.reddit.com/r/cpp_questions/comments/swaxw2/passing_a_vector_to_constructor/
         // https://stackoverflow.com/questions/46513507/c-copy-constructor-vs-move-constructor-for-stdvector
-        Matrix(std::vector<double> matrix, int rows, int cols); // constructor
-        // todo: default? destructor? copy constructor?
+        Matrix(const std::vector<double> &matrix, int rows, int cols); // constructor
 
-//        Matrix(std::vector<double> &&matrix, int rows, int cols); // rvalue constructor
+//        Matrix(const Matrix &other) = default;
+
+//        ~Matrix() = default;
+
+        Matrix(std::vector<double> &&matrix, int rows, int cols); // rvalue constructor
 
         Matrix operator-() const;
 
@@ -66,9 +70,9 @@ namespace zich {
 
         friend std::ostream &operator<<(std::ostream &out, const Matrix &matrix); // todo: does this need to be friend?
 
-        friend Matrix operator*(int scalar, const Matrix &matrix); // todo: make const int?
+        friend Matrix operator*(int scalar, const Matrix &matrix);
 
-        friend std::istream &operator>>(std::istream &in, const auto); // todo: check type
+        friend std::istream &operator>>(std::istream &in, const Matrix &matrix);
 
     };
 }
