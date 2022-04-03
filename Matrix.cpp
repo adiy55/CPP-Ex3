@@ -20,7 +20,7 @@ Matrix Matrix::operator-() const {
     return Matrix{res, _rows, _cols};
 }
 
-Matrix &Matrix::operator*=(const int scalar) {
+Matrix &Matrix::operator*=(const double scalar) {
     std::for_each(_matrix.begin(), _matrix.end(), [scalar](double &val) { val *= scalar; });
     return *this;
 }
@@ -106,7 +106,7 @@ std::ostream &zich::operator<<(std::ostream &out, const Matrix &matrix) {
     return out;
 }
 
-Matrix zich::operator*(const int scalar, const Matrix &matrix) {
+Matrix zich::operator*(const double scalar, const Matrix &matrix) {
     vector<double> res;
     res.reserve(matrix._matrix.size());
     for (const double &val: matrix._matrix) {
