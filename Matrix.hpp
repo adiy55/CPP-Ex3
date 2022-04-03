@@ -13,6 +13,14 @@ namespace zich {
         int _rows;
         int _cols;
 
+        static void checkInput(unsigned int mat_size, int rows, int cols);
+
+        static void checkDimensionsMul(int mat1_cols, int mat2_rows);
+
+        static void checkDimensionsEq(int rows1, int cols1, int rows2, int cols2);
+
+        std::string toString() const;
+
     public:
 
         // https://www.reddit.com/r/cpp_questions/comments/swaxw2/passing_a_vector_to_constructor/
@@ -68,7 +76,7 @@ namespace zich {
 
         // friend functions
 
-        friend std::ostream &operator<<(std::ostream &out, const Matrix &matrix); // todo: does this need to be friend?
+        friend std::ostream &operator<<(std::ostream &out, const Matrix &matrix);
 
         friend Matrix operator*(int scalar, const Matrix &matrix);
 
