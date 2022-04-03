@@ -27,7 +27,7 @@ namespace zich {
 
         Matrix operator-() const;
 
-        Matrix &operator*=(int scalar);
+        Matrix &operator*=(double scalar);
 
         Matrix operator+(const Matrix &other) const;
 
@@ -70,7 +70,7 @@ namespace zich {
 
         friend std::ostream &operator<<(std::ostream &out, const Matrix &matrix); // todo: does this need to be friend?
 
-        friend Matrix operator*(int scalar, const Matrix &matrix);
+        friend Matrix operator*(double scalar, const Matrix &matrix);
 
         friend std::istream &operator>>(std::istream &in, const Matrix &matrix);
 

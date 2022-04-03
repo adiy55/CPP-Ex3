@@ -13,7 +13,7 @@ Matrix Matrix::operator-() const {
     return Matrix{{}, 0, 0};
 }
 
-Matrix &Matrix::operator*=(const int scalar) {
+Matrix &Matrix::operator*=(const double scalar) {
     return *this;
 }
 
@@ -91,7 +91,7 @@ std::ostream &zich::operator<<(std::ostream &out, const Matrix &matrix) {
     return out;
 }
 
-Matrix zich::operator*(const int scalar, const Matrix &matrix) {
+Matrix zich::operator*(const double scalar, const Matrix &matrix) {
     return Matrix{{}, 0, 0};
 }
 
