@@ -14,10 +14,9 @@ Matrix::Matrix(std::vector<double> &&matrix, int rows, int cols) // rvalue refer
         : _matrix(std::move(matrix)), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); }
 
 Matrix Matrix::operator-() const {
-    vector<double> res;
-    res.reserve(_matrix.size());
-    std::for_each(_matrix.begin(), _matrix.end(), [&res](double val) { res.push_back(-val); });
-    return Matrix{res, _rows, _cols};
+    Matrix matrix{_matrix, _rows, _cols};
+    std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) { val = -val; });
+    return matrix;
 }
 
 Matrix &Matrix::operator*=(const double scalar) {
@@ -29,14 +28,19 @@ Matrix Matrix::operator+(const Matrix &other) const {
     checkDimensionsEq(_rows, _cols, other._rows, other._cols);
     vector<double> res;
     res.reserve(_matrix.size());
-    for (uint i = 0; i < res.size(); ++i) {
-        res[i] = _matrix[i] + other._matrix[i];
+    for (uint i = 0; i < _matrix.size(); ++i) {
+        res.push_back(_matrix[i] + other._matrix[i]);
     }
     return Matrix{res, _rows, _cols};
 }
 
 Matrix Matrix::operator-(const Matrix &other) const {
-    return Matrix{{}, 0, 0};
+    checkDimensionsEq(_rows, _cols, other._rows, other._cols);
+    Matrix res_matrix{_matrix, _rows, _cols};
+    for (uint i = 0; i < res_matrix._matrix.size(); ++i) {
+        res_matrix._matrix[i] -= other._matrix[i];
+    }
+    return res_matrix;
 }
 
 Matrix Matrix::operator+() const {
@@ -44,6 +48,10 @@ Matrix Matrix::operator+() const {
 }
 
 Matrix &Matrix::operator+=(const Matrix &other) {
+    checkDimensionsEq(_rows, _cols, other._rows, other._cols);
+    for (uint i = 0; i < _matrix.size(); ++i) {
+        _matrix[i] += other._matrix[i];
+    }
     return *this;
 }
 
