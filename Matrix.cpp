@@ -15,7 +15,7 @@ Matrix::Matrix(std::vector<double> &&matrix, int rows, int cols) // rvalue refer
 
 Matrix Matrix::operator-() const {
     Matrix matrix{_matrix, _rows, _cols};
-    std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) { val = -val; });
+    std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) { if (val != 0) val = -val; });
     return matrix;
 }
 
@@ -26,12 +26,11 @@ Matrix &Matrix::operator*=(const double scalar) {
 
 Matrix Matrix::operator+(const Matrix &other) const {
     checkDimensionsEq(_rows, _cols, other._rows, other._cols);
-    vector<double> res;
-    res.reserve(_matrix.size());
+    Matrix res_matrix{_matrix, _rows, _cols};
     for (uint i = 0; i < _matrix.size(); ++i) {
-        res.push_back(_matrix[i] + other._matrix[i]);
+        res_matrix._matrix[i] += other._matrix[i];
     }
-    return Matrix{res, _rows, _cols};
+    return res_matrix;
 }
 
 Matrix Matrix::operator-(const Matrix &other) const {
@@ -110,17 +109,27 @@ Matrix Matrix::operator*(const Matrix &other) const {
 // friend functions
 
 std::ostream &zich::operator<<(std::ostream &out, const Matrix &matrix) {
-    out << matrix.toString();
+    uint curr_row;
+    uint curr_col;
+    for (uint i = 0; i < matrix._rows; ++i) {
+        out << "[";
+        curr_row = i * static_cast<uint>(matrix._rows);
+        curr_col = curr_row + static_cast<uint>(matrix._cols);
+        for (uint j = curr_row; j < curr_col; ++j) {
+            out << matrix._matrix[j];
+            if (j < curr_col - 1) {
+                out << " ";
+            }
+        }
+        out << "]\n";
+    }
     return out;
 }
 
 Matrix zich::operator*(const double scalar, const Matrix &matrix) {
-    vector<double> res;
-    res.reserve(matrix._matrix.size());
-    for (const double &val: matrix._matrix) {
-        res.push_back(scalar * val);
-    }
-    return Matrix{res, matrix._rows, matrix._cols};
+    Matrix res_matrix{matrix._matrix, matrix._rows, matrix._cols};
+    std::for_each(res_matrix._matrix.begin(), res_matrix._matrix.end(), [scalar](double &val) { val *= scalar; });
+    return res_matrix;
 }
 
 std::istream &zich::operator>>(std::istream &in, const Matrix &matrix) {
