@@ -15,7 +15,11 @@ Matrix::Matrix(std::vector<double> &&matrix, int rows, int cols) // rvalue refer
 
 Matrix Matrix::operator-() const {
     Matrix matrix{_matrix, _rows, _cols};
-    std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) { if (val != 0) val = -val; });
+    std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) {
+        if (val != 0) {
+            val = -val;
+        }
+    });
     return matrix;
 }
 
@@ -55,6 +59,8 @@ Matrix &Matrix::operator+=(const Matrix &other) {
 }
 
 Matrix &Matrix::operator-=(const Matrix &other) {
+    checkDimensionsEq(_rows, _cols, other._rows, other._cols);
+
     return *this;
 }
 
@@ -75,31 +81,43 @@ bool Matrix::operator<=(const Matrix &other) const {
 }
 
 bool Matrix::operator==(const Matrix &other) const {
-    return false;
+    checkDimensionsEq(_rows, _cols, other._rows, other._cols);
+    for (uint i = 0; i < _matrix.size(); ++i) {
+        if (_matrix[i] != other._matrix[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool Matrix::operator!=(const Matrix &other) const {
-    return false;
+    return !((*this) == other);
 }
 
 // prefix (++i)
 
 Matrix &Matrix::operator++() {
+    std::for_each(_matrix.begin(), _matrix.end(), [](double &val) { val++; });
     return *this;
 }
 
 Matrix &Matrix::operator--() {
+    std::for_each(_matrix.begin(), _matrix.end(), [](double &val) { val--; });
     return *this;
 }
 
 // postfix (i++)
 
 Matrix Matrix::operator++(int) {
-    return Matrix{{}, 0, 0};
+    Matrix mat_copy{_matrix, _rows, _cols};
+    ++(*this);
+    return mat_copy;
 }
 
 Matrix Matrix::operator--(int) {
-    return Matrix{{}, 0, 0};
+    Matrix mat_copy{_matrix, _rows, _cols};
+    --(*this);
+    return mat_copy;
 }
 
 Matrix Matrix::operator*(const Matrix &other) const {
@@ -109,8 +127,8 @@ Matrix Matrix::operator*(const Matrix &other) const {
 // friend functions
 
 std::ostream &zich::operator<<(std::ostream &out, const Matrix &matrix) {
-    uint curr_row;
-    uint curr_col;
+    uint curr_row = 0;
+    uint curr_col = 0;
     for (uint i = 0; i < matrix._rows; ++i) {
         out << "[";
         curr_row = i * static_cast<uint>(matrix._rows);
