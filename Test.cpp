@@ -40,7 +40,7 @@ TEST_CASE ("Negative Dimensions") {
 TEST_CASE ("Dimensions do not match vector size") {
             CHECK_THROWS((Matrix{identity, 3, 1}));
             CHECK_THROWS((Matrix{identity, 0, 0}));
-            CHECK_THROWS((Matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 2, 9}));
+            CHECK_THROWS((Matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 2, 10}));
             CHECK_THROWS((Matrix{{11, 22, 33, 44, 55}, 4, 1}));
 }
 
@@ -89,13 +89,13 @@ TEST_CASE ("Compare") {
 TEST_CASE ("+ - operator") {
     Matrix mat1(Matrix{identity, 3, 3});
     Matrix mat2(Matrix{{2, 0, 0, 0, 2, 0, 0, 0, 2}, 3, 3});
-    Matrix mat3(Matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 1, 9});
-    Matrix mat4(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 9});
+    Matrix mat3(Matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 1, 10});
+    Matrix mat4(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 10});
     Matrix mat5(Matrix{{11.5, 22.6, 33.7, 44.8, 55.9}, 5, 1});
     Matrix mat6(Matrix{{12.5, 23.6, 34.7, 45.8, 56.9}, 5, 1});
 
             SUBCASE("+= operator") {
-        Matrix mat7(Matrix{{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 9, 1});
+        Matrix mat7(Matrix{{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 10, 1});
         Matrix mat8(Matrix{{1, 1, 1, 1, 1}, 5, 1});
                 CHECK((mat1 += mat1) == mat2);
                 CHECK_THROWS(mat3 += mat7);
@@ -169,12 +169,14 @@ TEST_CASE ("Output stream") {
             CHECK(stream.str() == "[1 0 0]\n"
                                   "[0 1 0]\n"
                                   "[0 0 1]\n");
+    stream.clear();
 
     Matrix mat2(Matrix{{11.5, 22.6, 33.7, 44.8, 55.9}, 5, 1});
     stream << mat2;
             CHECK(stream.str() == "[11.5 22.6 33.7 44.8 55.9]\n");
+    stream.clear();
 
-    Matrix mat3(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 9});
+    Matrix mat3(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 10});
     stream << mat3;
             CHECK(stream.str() == "[1]\n"
                                   "[2]\n"
@@ -187,4 +189,3 @@ TEST_CASE ("Output stream") {
                                   "[9]\n"
                                   "[10]\n");
 }
-// todo: output input stream tests
