@@ -1,32 +1,15 @@
-#include <random>
 #include <sstream>
 #include "doctest.h"
 #include "Matrix.hpp"
 
 using namespace zich;
 
-std::vector<double> identity = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+const std::vector<double> identity = {1, 0, 0, 0, 1, 0, 0, 0, 1};
 
 Matrix generateZeroMatrix(int rows, int cols) {
     std::vector<double> matrix(static_cast<uint>(rows * cols), 0);
     return Matrix{matrix, rows, cols};
 }
-
-//// https://stackoverflow.com/questions/14638739/generating-a-random-double-between-a-range-of-values
-//Matrix generateRandomMatrix(int rows, int cols) {
-//    std::vector<double> vector;
-//    vector.reserve(static_cast<uint>(rows * cols));
-//    std::uniform_real_distribution<double> dist(-500, 500);  // (min, max)
-//    // Mersenne Twister: Good quality random number generator
-//    std::mt19937 rng;
-//    // Initialize with non-deterministic seeds
-//    rng.seed(std::random_device{}());
-//    // generate rows*cols amount of random numbers
-//    for (int i = 0; i < (rows * cols); i++) {
-//        vector.push_back(dist(rng));
-//    }
-//    return Matrix{vector, rows, cols};
-//}
 
 TEST_CASE ("Bad Input: Initializing Matrix with Negative Dimensions") {
             CHECK_THROWS((Matrix{{}, 0, 0}););
@@ -37,7 +20,7 @@ TEST_CASE ("Bad Input: Initializing Matrix with Negative Dimensions") {
             CHECK_THROWS((Matrix{identity, -3, -3}));
 }
 
-TEST_CASE ("Bad Input: Initializing Matrix- dimensions that do not match vector size") {
+TEST_CASE ("Bad Input: Initializing Matrix with Dimensions that do not Match Vector Size") {
             CHECK_THROWS((Matrix{identity, 3, 1}));
             CHECK_THROWS((Matrix{identity, 0, 0}));
             CHECK_THROWS((Matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 2, 10}));
@@ -58,8 +41,6 @@ TEST_CASE ("Matrix Multiplication") {
                 CHECK_THROWS(mat1 * mat2);
                 CHECK_THROWS(mat4 * mat3);
                 CHECK_THROWS(mat1 * mat6); // vector size is the same, different dimensions
-
-
     }
 
             SUBCASE("Good Input- Valid Dimensions") {
@@ -67,6 +48,11 @@ TEST_CASE ("Matrix Multiplication") {
                 CHECK_NOTHROW(mat3 * mat4);
                 CHECK((mat1 * mat5) == (16.4 * mat1));
                 CHECK((mat6 * mat7) == mat8);
+    }
+
+            SUBCASE("*= matrix operator") {
+                CHECK_THROWS(mat1 *= mat2);
+                CHECK_THROWS(mat4 *= mat3);
     }
 
 }
@@ -77,7 +63,6 @@ TEST_CASE ("Matrix Multiplication") {
  */
 TEST_CASE ("Deep Copy- check if matrices are equal and have different memory addresses") {
     Matrix mat1{{454.24, -205, 5, -35, 22, -0}, 2, 3};
-//    Matrix mat1{generateRandomMatrix(12, 5)};
     Matrix mat2{mat1};
     Matrix mat3 = mat1;
     Matrix mat4(mat1);
@@ -93,26 +78,47 @@ TEST_CASE ("Comparison Operators") {
     Matrix mat2{generateZeroMatrix(3, 3)};
     Matrix mat3{generateZeroMatrix(9, 1)};
     Matrix mat4{Matrix{{16, 0, 0, 0, 16, 0, 0, 0, 16}, 3, 3}};
-//    Matrix mat5{generateRandomMatrix(25, 9)};
 
-            CHECK(mat1 != mat2);
-            CHECK_THROWS(bool check(mat2 == mat3));
-            CHECK_THROWS(if (mat2 == mat3));
+            SUBCASE("== operator") {
+                CHECK(mat1 == mat1);
+                CHECK(mat1 == Matrix{identity, 3, 3});
+                CHECK(mat4 == 16 * mat1);
+                CHECK_THROWS(mat3.operator==(Matrix{{-1, 0, 0, 0, -1, 0, 0, 0, -1}, 1, 9}));
+                CHECK_THROWS(mat2.operator==(mat3));
+    }
 
-            CHECK_THROWS(bool check(mat2 == mat3));
-            CHECK_THROWS(bool check(mat2 == mat3));
-            CHECK_THROWS(if (mat2 == mat3));
-            CHECK(mat4 == 16 * mat1);
+            SUBCASE("!= operator") {
+                CHECK(mat1 != mat2);
+                CHECK(mat1 != mat4);
+                CHECK_THROWS(mat2.operator!=(mat3));
+    }
 
-            CHECK(mat2 < mat1);
-            CHECK(mat2 <= mat1);
-            CHECK_THROWS(bool check(mat2 < mat3)); // different dimensions
+            SUBCASE("< operator") {
+                CHECK(mat1 < mat4);
+                CHECK_FALSE(mat1 < mat1);
+                CHECK(mat2 < mat1);
+                CHECK_THROWS(mat2.operator<(mat3));
+    }
 
-            CHECK(mat4 > mat1);
-//            CHECK(mat5 <= mat5);
-//            CHECK(mat5 >= mat5);
+            SUBCASE("<= operator") {
+                CHECK(mat3 <= mat3);
+                CHECK(mat1 <= mat4);
+                CHECK(mat2 <= mat1);
+                CHECK_THROWS(mat2.operator<=(mat3)); // different dimensions
+    }
 
-//            CHECK_THROWS(mat2 <= mat3);
+            SUBCASE("> operator") {
+                CHECK_FALSE(mat3 > mat3);
+                CHECK(mat4 > mat1);
+                CHECK_THROWS(mat2.operator>(mat3));
+    }
+
+            SUBCASE(">= operator") {
+                CHECK_FALSE(mat1 >= mat2);
+                CHECK(mat4 >= mat2);
+                CHECK_THROWS(mat2.operator>=(mat3));
+    }
+
 
 }
 
@@ -125,15 +131,32 @@ TEST_CASE ("Unary and Binary Operators (between matrices)") {
     Matrix mat5{Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 10}};
     Matrix mat6{Matrix{{11.5, 22.6, 33.7, 44.8, 55.9}, 5, 1}};
     Matrix mat7{Matrix{{12.5, 23.6, 34.7, 45.8, 56.9}, 5, 1}};
+    Matrix mat8{{2, 4, 6}, 3, 1};
+    Matrix mat9{{1, 2, 3}, 3, 1};
+    Matrix mat10{{1, 2, 3}, 1, 3};
 
             SUBCASE("+= operator") {
-        Matrix mat8(Matrix{{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 10, 1});
-        Matrix mat9(Matrix{{1, 1, 1, 1, 1}, 5, 1});
+        Matrix mat11(Matrix{{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 10, 1});
+        Matrix mat12(Matrix{{1, 1, 1, 1, 1}, 5, 1});
                 CHECK((mat1 += mat1) == mat2);
-                CHECK_THROWS(mat4 += mat8);
-                CHECK((mat6 += mat9) == mat7);
-                CHECK_THROWS(mat8 += mat1);
+                CHECK_THROWS(mat4 += mat11);
+                CHECK((mat6 += mat12) == mat7);
+                CHECK_THROWS(mat11 += mat1);
+    }
 
+            SUBCASE("-= operator") {
+        mat8 -= mat9;
+                CHECK(mat8 == mat9);
+                CHECK_THROWS(mat8 -= mat10);
+        Matrix zeros_mat{generateZeroMatrix(3, 3)};
+        mat1 -= zeros_mat;
+                CHECK(mat1 == Matrix{identity, 3, 3});
+    }
+
+            SUBCASE("*= scalar operator") {
+                CHECK(mat2 == 2 * mat1);
+                CHECK(mat8 == 2 * mat9);
+                CHECK_THROWS(mat10.operator==(2 * mat8));
     }
 
             SUBCASE("++ prefix") {
@@ -181,25 +204,25 @@ TEST_CASE ("Unary and Binary Operators (between matrices)") {
 }
 
 TEST_CASE ("Output stream") {
-    std::stringstream stream;
+    std::stringstream stream; // todo: add explanation
 
             SUBCASE("Output 1") {
-        Matrix mat1{identity, 3, 3};
-        stream << mat1;
+        Matrix mat{identity, 3, 3};
+        stream << mat;
                 CHECK(stream.str() == "[1 0 0]\n"
                                       "[0 1 0]\n"
                                       "[0 0 1]\n");
     }
 
             SUBCASE("Output 2") {
-        Matrix mat2{{11.5, 22.6, 33.7, 44.8, 55.9}, 1, 5};
-        stream << mat2;
+        Matrix mat{{11.5, 22.6, 33.7, 44.8, 55.9}, 1, 5};
+        stream << mat;
                 CHECK(stream.str() == "[11.5 22.6 33.7 44.8 55.9]\n");
     }
 
             SUBCASE("Output 3") {
-        Matrix mat3{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 10, 1};
-        stream << mat3;
+        Matrix mat{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 10, 1};
+        stream << mat;
                 CHECK(stream.str() == "[1]\n"
                                       "[2]\n"
                                       "[3]\n"
@@ -213,11 +236,19 @@ TEST_CASE ("Output stream") {
     }
 
             SUBCASE("Output 4") {
-        Matrix mat{{5, 8, 24, 30, 23, 45, 16, -5.7, 0.0, 0, -4, 7}, 4, 3}; // todo: -0.0
+        Matrix mat{{5, 8, 24, 30, 23, 45, 16, -5.7, 0.0, 0, -4, 7}, 4, 3};
         stream << mat;
                 CHECK(stream.str() == "[5 8 24]\n"
                                       "[30 23 45]\n"
                                       "[16 -5.7 0]\n"
                                       "[0 -4 7]\n");
+    }
+
+            SUBCASE("Output 5") {
+        Matrix mat{{-0.0, 0, 0, 0, -0, 0, 0, 0, -0.00}, 3, 3}; // should print zeros without negative sign
+        stream << mat;
+                CHECK(stream.str() == "[0 0 0]\n"
+                                      "[0 0 0]\n"
+                                      "[0 0 0]\n");
     }
 }
