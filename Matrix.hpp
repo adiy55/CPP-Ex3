@@ -46,7 +46,7 @@ namespace zich {
 
         Matrix operator-(const Matrix &other) const;
 
-        Matrix operator+() const; // todo: check
+        Matrix operator+() const;
 
         Matrix &operator+=(const Matrix &other);
 
@@ -90,8 +90,6 @@ namespace zich {
         friend std::istream &operator>>(std::istream &in, const Matrix &matrix);
 
         friend Matrix operator*(double scalar, const Matrix &matrix);
-
-//        friend Matrix operator*(const Matrix &matrix, double scalar); // todo???
 
     };
 }
