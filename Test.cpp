@@ -6,44 +6,6 @@ using namespace zich;
 
 std::vector<double> identity = {1, 0, 0, 0, 1, 0, 0, 0, 1};
 
-//TEST_CASE ("Good input") {
-//    std::vector<double> identity = {1, 0, 0, 0, 1, 0, 0, 0, 1};
-//    std::vector<double> arr = {3, 0, 0, 0, 3, 0, 0, 0, 3};
-//    Matrix a{identity, 3, 3};
-//    Matrix b{arr, 3, 3};
-//    Matrix c{{4, 0, 0, 0, 4, 0, 0, 0, 4}, 3, 3};
-//            SUBCASE("+= matrix") {
-//        a += b;
-//                CHECK(a == c);
-//    }
-//
-//}
-
-TEST_CASE ("Bad Input- Dimensions") {
-            SUBCASE("Negative Dimensions") {
-
-    }
-            SUBCASE("Dimensions that do not match vector size") {
-
-    }
-
-
-            SUBCASE("Operators between matrices with mismatching dimensions") {
-
-    }
-
-
-}
-
-TEST_CASE ("Operators") {
-
-
-            SUBCASE("Equals") {
-
-    }
-
-}
-
 //TEST_CASE("Binary Operators")
 
 // mat multiplication dimensions
@@ -88,15 +50,22 @@ TEST_CASE ("Negative Dimensions") {
 
 TEST_CASE ("Dimensions do not match vector size") {
             CHECK_THROWS((Matrix{identity, 3, 1}));
-
-
+            CHECK_THROWS((Matrix{identity, 0, 0}));
+            CHECK_THROWS((Matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 2, 9}));
+            CHECK_THROWS((Matrix{{11, 22, 33, 44, 55}, 4, 1}));
 }
 
 TEST_CASE ("Matrix multiplication with wrong dimensions") {
-    Matrix mat1 = generateRandomMatrix(5, 1);
-    Matrix mat2 = generateRandomMatrix(1, 5);
-            CHECK_THROWS(mat2 * mat1);
-            CHECK_NOTHROW(mat1 * mat2);
+    Matrix mat1(Matrix{identity, 3, 3});
+    Matrix mat2 = generateZeroMatrix(20, 3);
+    Matrix mat3 = generateRandomMatrix(5, 1);
+    Matrix mat4 = generateRandomMatrix(1, 5);
+
+            CHECK_THROWS(mat1 * mat2);
+            CHECK_NOTHROW(mat2 * mat1);
+
+            CHECK_THROWS(mat4 * mat3);
+            CHECK_NOTHROW(mat3 * mat4);
 
 }
 
@@ -105,33 +74,81 @@ TEST_CASE ("Compare") {
     Matrix mat2 = generateZeroMatrix(3, 3);
     Matrix mat3 = generateZeroMatrix(9, 1);
     Matrix mat4(Matrix{{16, 0, 0, 0, 16, 0, 0, 0, 16}, 3, 3});
+    Matrix mat5 = generateRandomMatrix(25, 9);
+
             CHECK(mat1 != mat2);
             CHECK(mat2 != mat3);
-            CHECK(mat4 != 16 * mat1);
+
+            CHECK_THROWS(bool check(mat2 == mat3));
+            CHECK_THROWS(if (mat2 == mat3));
+            CHECK(mat4 == 16 * mat1);
+
             CHECK(mat2 < mat1);
             CHECK(mat2 <= mat1);
-            CHECK_THROWS(if (mat2 == mat3));
+            CHECK(mat5 <= mat5);
+            CHECK_THROWS(bool check(mat2 < mat3)); // different dimensions
+
+            CHECK(mat4 > mat1);
+            CHECK(mat5 >= mat5);
+
+
 //            CHECK_THROWS(mat2 <= mat3);
 
 }
 
 TEST_CASE ("+ - operator") {
     Matrix mat1(Matrix{identity, 3, 3});
-    Matrix mat4(Matrix{{2, 0, 0, 0, 2, 0, 0, 0, 2}, 3, 3});
+    Matrix mat2(Matrix{{2, 0, 0, 0, 2, 0, 0, 0, 2}, 3, 3});
+    Matrix mat3(Matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 1, 9});
+    Matrix mat4(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 9});
+    Matrix mat5(Matrix{{11, 22, 33, 44, 55}, 5, 1});
+    Matrix mat6(Matrix{{12, 23, 34, 45, 56}, 5, 1});
 
-//            CHECK((mat1 += 1) =1= mat4);
-            SUBCASE("++") {
-                CHECK(++mat1 == mat4);
+            SUBCASE("+= operator") {
+        Matrix mat7(Matrix{{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 9, 1});
+        Matrix mat8(Matrix{{1, 1, 1, 1, 1}, 5, 1});
+                CHECK((mat1 += mat1) == mat2);
+                CHECK_THROWS(mat3 += mat7);
+                CHECK((mat5 += mat8) == mat6);
+                CHECK_THROWS(mat7 += mat1);
+
+    }
+
+            SUBCASE("++ prefix") {
+                CHECK(++mat1 == mat2);
+                CHECK(++mat3 == mat4);
+                CHECK(++mat5 == mat6);
     }
             SUBCASE("++ postfix") {
-                CHECK(mat1++ == mat4);
+                CHECK(mat1++ == mat2);
+                CHECK(mat3++ == mat4);
+                CHECK(mat5++ == mat6);
     }
             SUBCASE("-- prefix") {
-                CHECK(mat1 == --mat4);
+                CHECK(mat1 == --mat2);
+                CHECK(mat3 == --mat4);
+                CHECK(mat5 == --mat6);
     }
             SUBCASE("-- postfix") {
-                CHECK(mat1 == mat4--);
+                CHECK(mat1 == mat2--);
+                CHECK(mat3 == mat4--);
+                CHECK(mat5 == mat6--);
     }
+
+            SUBCASE("Operators with zero matrix") {
+        Matrix zero_mat = generateZeroMatrix(3, 3);
+        Matrix ones_mat({{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 3, 3});
+                CHECK((mat1 += zero_mat) == mat1);
+                CHECK((mat2 -= 2 * mat1) == zero_mat);
+                CHECK_THROWS(zero_mat + mat3);
+                CHECK_THROWS(zero_mat * mat4);
+                CHECK(zero_mat++ == ones_mat);
+    }
+
+}
+
+TEST_CASE ("Matrix multiplication") {
+
 
 }
 
