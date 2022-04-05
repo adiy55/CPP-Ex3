@@ -8,7 +8,7 @@ using namespace zich;
 std::vector<double> identity = {1, 0, 0, 0, 1, 0, 0, 0, 1};
 
 Matrix generateZeroMatrix(int rows, int cols) {
-    std::vector<double> matrix(0, rows * cols);
+    std::vector<double> matrix(static_cast<uint>(rows * cols), 0);
     return Matrix{matrix, rows, cols};
 }
 
