@@ -2,10 +2,10 @@
 
 typedef unsigned int uint;
 
-using namespace zich;
 using std::string;
 using std::vector;
 
+namespace zich {
 
 Matrix::Matrix(const std::vector<double> &matrix, int rows, int cols)
         : _matrix(matrix), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); }
