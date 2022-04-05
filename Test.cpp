@@ -116,7 +116,7 @@ TEST_CASE ("+ - operator") {
                 CHECK(mat1 == mat3);
                 CHECK(mat4++ != mat5);
                 CHECK(mat4 == mat5);
-                CHECK(mat6++ == mat6);
+                CHECK(mat6++ != mat6); // left is before increment, right is after increment
                 CHECK(mat6 == mat7);
     }
 
@@ -131,7 +131,7 @@ TEST_CASE ("+ - operator") {
                 CHECK(mat1 == mat3);
                 CHECK(mat4 != mat5--);
                 CHECK(mat4 == mat5);
-                CHECK(mat7 == mat7--);
+                CHECK(mat7-- != mat7); // left is before decrement, right is after decrement
                 CHECK(mat6 == mat7);
     }
 
@@ -153,12 +153,13 @@ TEST_CASE ("Matrix multiplication") {
     Matrix mat1(Matrix{identity, 3, 3});
     Matrix mat2(Matrix{{16.4, 0, 0, 0, 16.4, 0, 0, 0, 16.4}, 3, 3});
     Matrix mat3 = generateRandomMatrix(9, 1);
-    Matrix mat4 = generateZeroMatrix(9, 1);
+    Matrix mat4 = generateZeroMatrix(1, 9);
+    Matrix mat5 = generateZeroMatrix(9, 9);
 
             CHECK((mat1 * mat2) == (16.4 * mat1));
             CHECK_THROWS(mat1 * mat3);
 
-            CHECK((mat3 * mat4) == mat4);
+            CHECK((mat3 * mat4) == mat5);
 
 }
 
