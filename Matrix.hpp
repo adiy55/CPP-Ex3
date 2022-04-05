@@ -43,7 +43,7 @@ namespace zich {
 
         Matrix operator-(const Matrix &other) const;
 
-        Matrix operator+() const;
+        Matrix operator+() const; // todo: check
 
         Matrix &operator+=(const Matrix &other);
 
@@ -77,6 +77,8 @@ namespace zich {
 
 
         Matrix operator*(const Matrix &other) const; // todo: throw exception if dimensions don't match
+
+        Matrix &operator*=(const Matrix &other);
 
         // friend functions
 

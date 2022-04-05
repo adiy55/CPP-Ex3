@@ -178,13 +178,13 @@ TEST_CASE ("Output stream") {
     }
 
             SUBCASE("Output 2") {
-        Matrix mat2(Matrix{{11.5, 22.6, 33.7, 44.8, 55.9}, 5, 1});
+        Matrix mat2(Matrix{{11.5, 22.6, 33.7, 44.8, 55.9}, 1, 5});
         stream << mat2;
                 CHECK(stream.str() == "[11.5 22.6 33.7 44.8 55.9]\n");
     }
 
             SUBCASE("Output 3") {
-        Matrix mat3(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 10});
+        Matrix mat3(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 10, 1});
         stream << mat3;
                 CHECK(stream.str() == "[1]\n"
                                       "[2]\n"
