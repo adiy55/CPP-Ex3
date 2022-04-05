@@ -103,26 +103,31 @@ TEST_CASE ("+ - operator") {
                 CHECK_THROWS(mat7 += mat1);
 
     }
+
             SUBCASE("++ prefix") {
                 CHECK(++mat1 == mat2);
                 CHECK(++mat3 == mat4);
                 CHECK(++mat5 == mat6);
     }
+
             SUBCASE("++ postfix") {
                 CHECK(mat1++ == mat2);
                 CHECK(mat3++ == mat4);
                 CHECK(mat5++ == mat6);
     }
+
             SUBCASE("-- prefix") {
                 CHECK(mat1 == --mat2);
                 CHECK(mat3 == --mat4);
                 CHECK(mat5 == --mat6);
     }
+
             SUBCASE("-- postfix") {
                 CHECK(mat1 == mat2--);
                 CHECK(mat3 == mat4--);
                 CHECK(mat5 == mat6--);
     }
+
             SUBCASE("Operators with zero matrix") {
         Matrix zero_mat = generateZeroMatrix(3, 3);
         Matrix ones_mat({{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 3, 3});
@@ -148,7 +153,6 @@ TEST_CASE ("Matrix multiplication") {
 
 }
 
-
 TEST_CASE ("Deep copy check") {
     Matrix mat1 = generateRandomMatrix(12, 5);
     Matrix mat2(mat1);
@@ -163,29 +167,34 @@ TEST_CASE ("Deep copy check") {
 }
 
 TEST_CASE ("Output stream") {
-    Matrix mat1{identity, 3, 3};
     std::stringstream stream;
-    stream << mat1;
-            CHECK(stream.str() == "[1 0 0]\n"
-                                  "[0 1 0]\n"
-                                  "[0 0 1]\n");
-    stream.clear();
 
-    Matrix mat2(Matrix{{11.5, 22.6, 33.7, 44.8, 55.9}, 5, 1});
-    stream << mat2;
-            CHECK(stream.str() == "[11.5 22.6 33.7 44.8 55.9]\n");
-    stream.clear();
+            SUBCASE("Output 1") {
+        Matrix mat1{identity, 3, 3};
+        stream << mat1;
+                CHECK(stream.str() == "[1 0 0]\n"
+                                      "[0 1 0]\n"
+                                      "[0 0 1]\n");
+    }
 
-    Matrix mat3(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 10});
-    stream << mat3;
-            CHECK(stream.str() == "[1]\n"
-                                  "[2]\n"
-                                  "[3]\n"
-                                  "[4]\n"
-                                  "[5]\n"
-                                  "[6]\n"
-                                  "[7]\n"
-                                  "[8]\n"
-                                  "[9]\n"
-                                  "[10]\n");
+            SUBCASE("Output 2") {
+        Matrix mat2(Matrix{{11.5, 22.6, 33.7, 44.8, 55.9}, 5, 1});
+        stream << mat2;
+                CHECK(stream.str() == "[11.5 22.6 33.7 44.8 55.9]\n");
+    }
+
+            SUBCASE("Output 3") {
+        Matrix mat3(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 10});
+        stream << mat3;
+                CHECK(stream.str() == "[1]\n"
+                                      "[2]\n"
+                                      "[3]\n"
+                                      "[4]\n"
+                                      "[5]\n"
+                                      "[6]\n"
+                                      "[7]\n"
+                                      "[8]\n"
+                                      "[9]\n"
+                                      "[10]\n");
+    }
 }
