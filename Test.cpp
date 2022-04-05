@@ -89,53 +89,62 @@ TEST_CASE ("Compare") {
 TEST_CASE ("+ - operator") {
     Matrix mat1(Matrix{identity, 3, 3});
     Matrix mat2(Matrix{{2, 0, 0, 0, 2, 0, 0, 0, 2}, 3, 3});
-    Matrix mat3(Matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 1, 10});
-    Matrix mat4(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 10});
-    Matrix mat5(Matrix{{11.5, 22.6, 33.7, 44.8, 55.9}, 5, 1});
-    Matrix mat6(Matrix{{12.5, 23.6, 34.7, 45.8, 56.9}, 5, 1});
+    Matrix mat3(Matrix{{2, 1, 1, 1, 2, 1, 1, 1, 2}, 3, 3});
+    Matrix mat4(Matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 1, 10});
+    Matrix mat5(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 10});
+    Matrix mat6(Matrix{{11.5, 22.6, 33.7, 44.8, 55.9}, 5, 1});
+    Matrix mat7(Matrix{{12.5, 23.6, 34.7, 45.8, 56.9}, 5, 1});
 
             SUBCASE("+= operator") {
-        Matrix mat7(Matrix{{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 10, 1});
-        Matrix mat8(Matrix{{1, 1, 1, 1, 1}, 5, 1});
+        Matrix mat8(Matrix{{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 10, 1});
+        Matrix mat9(Matrix{{1, 1, 1, 1, 1}, 5, 1});
                 CHECK((mat1 += mat1) == mat2);
-                CHECK_THROWS(mat3 += mat7);
-                CHECK((mat5 += mat8) == mat6);
-                CHECK_THROWS(mat7 += mat1);
+                CHECK_THROWS(mat4 += mat8);
+                CHECK((mat6 += mat9) == mat7);
+                CHECK_THROWS(mat8 += mat1);
 
     }
 
             SUBCASE("++ prefix") {
-                CHECK(++mat1 == mat2);
-                CHECK(++mat3 == mat4);
-                CHECK(++mat5 == mat6);
+                CHECK(++mat1 == mat3);
+                CHECK(++mat4 == mat5);
+                CHECK(++mat6 == mat7);
     }
 
             SUBCASE("++ postfix") {
-                CHECK(mat1++ == mat2);
-                CHECK(mat3++ == mat4);
-                CHECK(mat5++ == mat6);
+                CHECK(mat1++ != mat2);
+                CHECK(mat1 == mat3);
+                CHECK(mat4++ != mat5);
+                CHECK(mat4 == mat5);
+                CHECK(mat6++ == mat6);
+                CHECK(mat6 == mat7);
     }
 
             SUBCASE("-- prefix") {
-                CHECK(mat1 == --mat2);
-                CHECK(mat3 == --mat4);
-                CHECK(mat5 == --mat6);
+                CHECK(mat1 == --mat3);
+                CHECK(mat4 == --mat5);
+                CHECK(mat6 == --mat7);
     }
 
             SUBCASE("-- postfix") {
-                CHECK(mat1 == mat2--);
-                CHECK(mat3 == mat4--);
-                CHECK(mat5 == mat6--);
+                CHECK(mat1 != mat3--);
+                CHECK(mat1 == mat3);
+                CHECK(mat4 != mat5--);
+                CHECK(mat4 == mat5);
+                CHECK(mat7 == mat7--);
+                CHECK(mat6 == mat7);
     }
 
             SUBCASE("Operators with zero matrix") {
         Matrix zero_mat = generateZeroMatrix(3, 3);
-        Matrix ones_mat({{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 3, 3});
+        Matrix ones_mat({{1, 1, 1, 1, 1, 1, 1, 1, 1}, 3, 3});
                 CHECK((mat1 += zero_mat) == mat1);
                 CHECK((mat2 -= 2 * mat1) == zero_mat);
-                CHECK_THROWS(zero_mat + mat3);
-                CHECK_THROWS(zero_mat * mat4);
-                CHECK(zero_mat++ == ones_mat);
+                CHECK_THROWS(zero_mat + mat4);
+                CHECK_THROWS(zero_mat * mat5);
+                CHECK(zero_mat++ != ones_mat);
+                CHECK(zero_mat-- == ones_mat);
+                CHECK(zero_mat == --ones_mat);
     }
 
 }
