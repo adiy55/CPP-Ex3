@@ -5,6 +5,13 @@
 #include <vector>
 #include <string>
 
+/*
+ * Why the {}-initializer (list initialization) syntax is preferred:
+ * https://tinyurl.com/5f4rw4xb
+ * https://isocpp.org/blog/2016/05/quick-q-why-is-list-initialization-using-curly-braces-better-than-the-alter
+ * Most vexing parse: (another reason curly brackets should be used)
+ * https://www.fluentcpp.com/2018/01/30/most-vexing-parse/
+ */
 namespace zich {
 
     class Matrix {
