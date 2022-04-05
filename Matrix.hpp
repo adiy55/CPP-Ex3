@@ -21,6 +21,8 @@ namespace zich {
 
         std::string toString() const;
 
+        double calculateSum() const;
+
     public:
 
         // https://www.reddit.com/r/cpp_questions/comments/swaxw2/passing_a_vector_to_constructor/

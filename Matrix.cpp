@@ -60,24 +60,30 @@ namespace zich {
 
     Matrix &Matrix::operator-=(const Matrix &other) {
         checkDimensionsEq(_rows, _cols, other._rows, other._cols);
-
+        for (uint i = 0; i < _matrix.size(); ++i) {
+            _matrix[i] -= other._matrix[i];
+        }
         return *this;
     }
 
     bool Matrix::operator>(const Matrix &other) const {
-        return false;
+        checkDimensionsEq(_rows, _cols, other._rows, other._cols);
+        return (this->calculateSum() > other.calculateSum());
     }
 
     bool Matrix::operator>=(const Matrix &other) const {
-        return false;
+        checkDimensionsEq(_rows, _cols, other._rows, other._cols);
+        return (this->calculateSum() >= other.calculateSum());
     }
 
     bool Matrix::operator<(const Matrix &other) const {
-        return false;
+        checkDimensionsEq(_rows, _cols, other._rows, other._cols);
+        return (this->calculateSum() < other.calculateSum());
     }
 
     bool Matrix::operator<=(const Matrix &other) const {
-        return false;
+        checkDimensionsEq(_rows, _cols, other._rows, other._cols);
+        return (this->calculateSum() <= other.calculateSum());
     }
 
     bool Matrix::operator==(const Matrix &other) const {
@@ -121,6 +127,7 @@ namespace zich {
     }
 
     Matrix Matrix::operator*(const Matrix &other) const {
+        checkDimensionsMul(_cols, other._rows);
         return Matrix{{}, 0, 0};
     }
 
@@ -157,7 +164,7 @@ namespace zich {
 // class methods and helper functions
 
     void Matrix::checkInput(uint mat_size, int rows, int cols) {
-        if (rows < 0 || cols < 0 || mat_size != (rows * cols)) {
+        if (rows < 1 || cols < 1 || mat_size != (rows * cols)) {
             throw std::invalid_argument("Invalid matrix size!");
         }
     }
@@ -179,6 +186,14 @@ namespace zich {
         std::for_each(_matrix.begin(), _matrix.end(),
                       [&mat_str](const double &val) { mat_str += std::to_string(std::float_round_style(val)) + " "; });
         return mat_str;
+    }
+
+    double Matrix::calculateSum() const {
+        double mat_sum = 0;
+        for (const double &val: _matrix) {
+            mat_sum += val;
+        }
+        return mat_sum;
     }
 
 }
