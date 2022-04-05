@@ -138,15 +138,13 @@ namespace zich {
 // friend functions
 
     std::ostream &operator<<(std::ostream &out, const Matrix &matrix) {
-        uint curr_row = 0;
-        uint curr_col = 0;
         for (uint i = 0; i < matrix._rows; ++i) {
             out << "[";
-            curr_row = i * static_cast<uint>(matrix._rows);
-            curr_col = curr_row + static_cast<uint>(matrix._cols);
-            for (uint j = curr_row; j < curr_col; ++j) {
+            uint start_index = i * static_cast<uint>(matrix._cols);
+            uint end_of_row_index = start_index + static_cast<uint>(matrix._cols);
+            for (uint j = start_index; j < end_of_row_index; ++j) {
                 out << matrix._matrix[j];
-                if (j < curr_col - 1) {
+                if (j < end_of_row_index - 1) {
                     out << " ";
                 }
             }
