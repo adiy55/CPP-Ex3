@@ -64,8 +64,6 @@ namespace zich {
 
         bool operator!=(const Matrix &other) const;
 
-        // todo: = operator
-
         // prefix (++i)
 
         Matrix &operator++();

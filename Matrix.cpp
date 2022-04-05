@@ -15,11 +15,7 @@ namespace zich {
 
     Matrix Matrix::operator-() const {
         Matrix matrix{_matrix, _rows, _cols};
-        std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) {
-            if (val != 0) {
-                val = -val;
-            }
-        });
+        std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) { if (val != 0) { val = -val; }});
         return matrix;
     }
 
@@ -72,8 +68,7 @@ namespace zich {
     }
 
     bool Matrix::operator>=(const Matrix &other) const {
-        checkDimensionsEq(_rows, _cols, other._rows, other._cols);
-        return (this->calculateSum() >= other.calculateSum());
+        return (*this > other || *this == other);
     }
 
     bool Matrix::operator<(const Matrix &other) const {
@@ -82,8 +77,7 @@ namespace zich {
     }
 
     bool Matrix::operator<=(const Matrix &other) const {
-        checkDimensionsEq(_rows, _cols, other._rows, other._cols);
-        return (this->calculateSum() <= other.calculateSum());
+        return (*this < other || *this == other);
     }
 
     bool Matrix::operator==(const Matrix &other) const {
@@ -128,10 +122,22 @@ namespace zich {
 
     Matrix Matrix::operator*(const Matrix &other) const {
         checkDimensionsMul(_cols, other._rows);
-        return Matrix{{}, 0, 0};
+        /*
+         * 123
+         *
+         * 1
+         * 2
+         * 3
+         *
+         *
+         */
+        vector<double> mat_mul(0, static_cast<uint>(_rows * other._cols));
+//        mat_mul.reserve(static_cast<uint>(_rows * other._cols));
+        return Matrix{mat_mul, _rows, other._cols};
     }
 
     Matrix &Matrix::operator*=(const Matrix &other) {
+        checkDimensionsMul(_cols, other._rows);
         return *this;
     }
 
