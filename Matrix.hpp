@@ -23,6 +23,8 @@ namespace zich {
 
         Matrix operator-() const;
 
+        // https://clang.llvm.org/extra/clang-tidy/checks/readability-avoid-const-params-in-decls.html
+        // https://abseil.io/tips/109
         Matrix &operator*=(double scalar);
 
         Matrix operator+(const Matrix &other) const;
