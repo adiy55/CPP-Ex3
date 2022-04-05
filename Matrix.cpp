@@ -84,6 +84,10 @@ namespace zich {
         return Matrix{{}, 0, 0};
     }
 
+    Matrix &Matrix::operator*=(const Matrix &other) {
+        return *this;
+    }
+
 // friend functions
 
     std::ostream &operator<<(std::ostream &out, const Matrix &matrix) {
