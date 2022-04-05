@@ -183,13 +183,6 @@ namespace zich {
         }
     }
 
-    std::string Matrix::toString() const {
-        string mat_str;
-        std::for_each(_matrix.begin(), _matrix.end(),
-                      [&mat_str](const double &val) { mat_str += std::to_string(std::float_round_style(val)) + " "; });
-        return mat_str;
-    }
-
     double Matrix::calculateSum() const {
         double mat_sum = 0;
         for (const double &val: _matrix) {

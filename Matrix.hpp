@@ -19,8 +19,6 @@ namespace zich {
 
         static void checkDimensionsEq(int rows1, int cols1, int rows2, int cols2);
 
-        std::string toString() const;
-
         double calculateSum() const;
 
     public:
