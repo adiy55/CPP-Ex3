@@ -2,6 +2,8 @@
 #include "doctest.h"
 #include "Matrix.hpp"
 
+typedef unsigned int uint;
+
 using namespace zich;
 
 const std::vector<double> identity = {1, 0, 0, 0, 1, 0, 0, 0, 1}; // global because this is used frequently
