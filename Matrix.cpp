@@ -23,7 +23,7 @@ namespace zich {
         return matrix;
     }
 
-    Matrix &Matrix::operator*=(const double scalar) {
+    Matrix &Matrix::operator*=(double scalar) {
         std::for_each(_matrix.begin(), _matrix.end(), [scalar](double &val) { val *= scalar; });
         return *this;
     }
@@ -153,14 +153,14 @@ namespace zich {
         return out;
     }
 
-    Matrix operator*(const double scalar, const Matrix &matrix) {
+    std::istream &operator>>(std::istream &in, const Matrix &matrix) {
+        return in;
+    }
+
+    Matrix operator*(double scalar, const Matrix &matrix) {
         Matrix res_matrix{matrix._matrix, matrix._rows, matrix._cols};
         std::for_each(res_matrix._matrix.begin(), res_matrix._matrix.end(), [scalar](double &val) { val *= scalar; });
         return res_matrix;
-    }
-
-    std::istream &operator>>(std::istream &in, const Matrix &matrix) {
-        return in;
     }
 
 // class methods and helper functions
