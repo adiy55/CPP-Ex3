@@ -4,25 +4,30 @@
 
 using namespace zich;
 
-const std::vector<double> identity = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+const std::vector<double> identity = {1, 0, 0, 0, 1, 0, 0, 0, 1}; // global because this is used frequently
 
+/**
+ * Helper function for tests.
+ * @return zero matrix of the given size
+ */
 Matrix generateZeroMatrix(int rows, int cols) {
     std::vector<double> matrix(static_cast<uint>(rows * cols), 0);
     return Matrix{matrix, rows, cols};
 }
 
-TEST_CASE ("Bad Input: Initializing Matrix with Negative Dimensions") {
+TEST_CASE ("Bad Input- initializing matrix with negative dimensions") {
             CHECK_THROWS((Matrix{{}, 0, 0}););
             CHECK_THROWS((Matrix{{0, 1}, -2, -1}););
             CHECK_NOTHROW((Matrix{identity, 3, 3}));
             CHECK_THROWS((Matrix{identity, -3, 3}));
             CHECK_THROWS((Matrix{identity, 3, -3}));
-            CHECK_THROWS((Matrix{identity, -3, -3}));
+            CHECK_THROWS((Matrix{identity, -3, -3})); // rows*cols is positive here
 }
 
-TEST_CASE ("Bad Input: Initializing Matrix with Dimensions that do not Match Vector Size") {
-            CHECK_THROWS((Matrix{identity, 3, 1}));
-            CHECK_THROWS((Matrix{identity, 0, 0}));
+TEST_CASE ("Bad Input- initializing matrix with dimensions that do not match vector size") {
+            CHECK_THROWS((Matrix{identity, 3, 1})); // identity vector contains 9 values
+            CHECK_THROWS((Matrix{identity, 0, 0})); // zero is invalid
+            CHECK_THROWS((Matrix{{-0.0}, 0, 1})); // zero is invalid
             CHECK_THROWS((Matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 2, 10}));
             CHECK_THROWS((Matrix{{11, 22, 33, 44, 55}, 4, 1}));
 }
@@ -37,13 +42,13 @@ TEST_CASE ("Matrix Multiplication") {
     Matrix mat7{generateZeroMatrix(1, 9)};
     Matrix mat8{generateZeroMatrix(9, 9)};
 
-            SUBCASE("Bad Input- Wrong Dimensions") {
+            SUBCASE("Bad Input- wrong dimensions") {
                 CHECK_THROWS(mat1 * mat2);
                 CHECK_THROWS(mat4 * mat3);
                 CHECK_THROWS(mat1 * mat6); // vector size is the same, different dimensions
     }
 
-            SUBCASE("Good Input- Valid Dimensions") {
+            SUBCASE("Good Input- valid dimensions") {
                 CHECK_NOTHROW(mat2 * mat1);
                 CHECK_NOTHROW(mat3 * mat4);
                 CHECK((mat1 * mat5) == (16.4 * mat1));
@@ -135,6 +140,11 @@ TEST_CASE ("Unary and Binary Operators (between matrices)") {
     Matrix mat9{{1, 2, 3}, 3, 1};
     Matrix mat10{{1, 2, 3}, 1, 3};
 
+            SUBCASE("- operator") {
+                CHECK(-mat1 == Matrix{{-1, 0, 0, 0, -1, 0, 0, 0, -1}, 3, 3});
+                CHECK(Matrix{{-12.5, -23.6, -34.7, -45.8, -56.9}, 5, 1} == -mat7);
+    }
+
             SUBCASE("+= operator") {
         Matrix mat11(Matrix{{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 10, 1});
         Matrix mat12(Matrix{{1, 1, 1, 1, 1}, 5, 1});
@@ -200,11 +210,16 @@ TEST_CASE ("Unary and Binary Operators (between matrices)") {
                 CHECK(zero_mat-- == ones_mat);
                 CHECK(zero_mat == --ones_mat);
     }
-
 }
 
 TEST_CASE ("Output stream") {
-    std::stringstream stream; // todo: add explanation
+    /*
+     * stringstream allows a string object to be treated as a stream (both input and output).
+     * insertion << and extraction >> operators, work like i/ostream.
+     *
+     * I used this to get and validate the output of a matrix object.
+     */
+    std::stringstream stream;
 
             SUBCASE("Output 1") {
         Matrix mat{identity, 3, 3};
