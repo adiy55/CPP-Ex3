@@ -16,12 +16,12 @@ Matrix generateZeroMatrix(int rows, int cols) {
 Matrix generateRandomMatrix(int rows, int cols) {
     std::vector<double> vector;
     vector.reserve(static_cast<uint>(rows * cols));
-    std::uniform_real_distribution<double> dist(-500, 500);  //(min, max)
+    std::uniform_real_distribution<double> dist(-500, 500);  // (min, max)
     // Mersenne Twister: Good quality random number generator
     std::mt19937 rng;
     // Initialize with non-deterministic seeds
     rng.seed(std::random_device{}());
-    // generate 10 random numbers.
+    // generate rows*cols amount of random numbers
     for (int i = 0; i < (rows * cols); i++) {
         vector.push_back(dist(rng));
     }
@@ -66,7 +66,8 @@ TEST_CASE ("Compare") {
     Matrix mat5 = generateRandomMatrix(25, 9);
 
             CHECK(mat1 != mat2);
-            CHECK(mat2 != mat3);
+            CHECK_THROWS(bool check(mat2 == mat3));
+            CHECK_THROWS(if (mat2 == mat3));
 
             CHECK_THROWS(bool check(mat2 == mat3));
             CHECK_THROWS(bool check(mat2 == mat3));
@@ -102,7 +103,6 @@ TEST_CASE ("+ - operator") {
                 CHECK_THROWS(mat7 += mat1);
 
     }
-
             SUBCASE("++ prefix") {
                 CHECK(++mat1 == mat2);
                 CHECK(++mat3 == mat4);
@@ -123,7 +123,6 @@ TEST_CASE ("+ - operator") {
                 CHECK(mat3 == mat4--);
                 CHECK(mat5 == mat6--);
     }
-
             SUBCASE("Operators with zero matrix") {
         Matrix zero_mat = generateZeroMatrix(3, 3);
         Matrix ones_mat({{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 3, 3});
@@ -171,5 +170,21 @@ TEST_CASE ("Output stream") {
                                   "[0 1 0]\n"
                                   "[0 0 1]\n");
 
+    Matrix mat2(Matrix{{11.5, 22.6, 33.7, 44.8, 55.9}, 5, 1});
+    stream << mat2;
+            CHECK(stream.str() == "[11.5 22.6 33.7 44.8 55.9]\n");
+
+    Matrix mat3(Matrix{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 1, 9});
+    stream << mat3;
+            CHECK(stream.str() == "[1]\n"
+                                  "[2]\n"
+                                  "[3]\n"
+                                  "[4]\n"
+                                  "[5]\n"
+                                  "[6]\n"
+                                  "[7]\n"
+                                  "[8]\n"
+                                  "[9]\n"
+                                  "[10]\n");
 }
 // todo: output input stream tests
