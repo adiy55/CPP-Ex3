@@ -19,10 +19,6 @@ namespace zich {
         // https://stackoverflow.com/questions/46513507/c-copy-constructor-vs-move-constructor-for-stdvector
         Matrix(const std::vector<double> &matrix, int rows, int cols); // constructor
 
-//        Matrix(const Matrix &other) = default;
-
-//        ~Matrix() = default;
-
         Matrix(std::vector<double> &&matrix, int rows, int cols); // rvalue constructor
 
         Matrix operator-() const;
@@ -64,7 +60,7 @@ namespace zich {
         Matrix operator--(int);
 
 
-        Matrix operator*(const Matrix &other) const; // todo: throw exception if dimensions don't match
+        Matrix operator*(const Matrix &other) const;
 
         Matrix &operator*=(const Matrix &other);
 

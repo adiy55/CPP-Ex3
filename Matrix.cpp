@@ -12,7 +12,7 @@ namespace zich {
         return Matrix{{}, 0, 0};
     }
 
-    Matrix &Matrix::operator*=(const double scalar) {
+    Matrix &Matrix::operator*=(double scalar) {
         return *this;
     }
 
@@ -98,7 +98,7 @@ namespace zich {
         return in;
     }
 
-    Matrix operator*(const double scalar, const Matrix &matrix) {
+    Matrix operator*(double scalar, const Matrix &matrix) {
         return Matrix{{}, 0, 0};
     }
 
