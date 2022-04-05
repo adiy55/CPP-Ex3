@@ -126,7 +126,7 @@ namespace zich {
 
 // friend functions
 
-    std::ostream &zich::operator<<(std::ostream &out, const Matrix &matrix) {
+    std::ostream &operator<<(std::ostream &out, const Matrix &matrix) {
         uint curr_row = 0;
         uint curr_col = 0;
         for (uint i = 0; i < matrix._rows; ++i) {
@@ -144,13 +144,13 @@ namespace zich {
         return out;
     }
 
-    Matrix zich::operator*(const double scalar, const Matrix &matrix) {
+    Matrix operator*(const double scalar, const Matrix &matrix) {
         Matrix res_matrix{matrix._matrix, matrix._rows, matrix._cols};
         std::for_each(res_matrix._matrix.begin(), res_matrix._matrix.end(), [scalar](double &val) { val *= scalar; });
         return res_matrix;
     }
 
-    std::istream &zich::operator>>(std::istream &in, const Matrix &matrix) {
+    std::istream &operator>>(std::istream &in, const Matrix &matrix) {
         return in;
     }
 
