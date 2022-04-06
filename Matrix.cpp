@@ -8,10 +8,16 @@ using std::vector;
 namespace zich {
 
     Matrix::Matrix(const std::vector<double> &matrix, int rows, int cols)
-            : _matrix(matrix), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); this->setZeros(); }
+            : _matrix(matrix), _rows(rows), _cols(cols) {
+        checkInput(_matrix.size(), _rows, _cols);
+        this->setZeros();
+    }
 
     Matrix::Matrix(std::vector<double> &&matrix, int rows, int cols) // rvalue reference // move constructor
-            : _matrix(std::move(matrix)), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); this->setZeros(); }
+            : _matrix(std::move(matrix)), _rows(rows), _cols(cols) {
+        checkInput(_matrix.size(), _rows, _cols);
+        this->setZeros();
+    }
 
     Matrix Matrix::operator-() const {
         Matrix matrix{*this};
@@ -137,25 +143,24 @@ namespace zich {
          *      cols -skip right += row
          *
          */
-        vector<double> mat_mul(static_cast<uint>(_rows * other._cols), 0);
-        for (uint i = 0; i < other._cols; ++i) {
-            for (uint j = 0; j < _cols; ++j) {
-                for (uint k = 0; k < other._rows; ++k) {
-
-
+        vector<double> mat_mul;
+        uint curr_index = 0;
+        uint step = static_cast<uint>(other._cols);
+        uint curr_col;
+        double curr_sum = 0;
+        for (uint i = 0; i < _matrix.size(); i += static_cast<uint>(_cols)) {
+            curr_col = 0;
+            for (uint j = 0; j < other._matrix.size(); ++j) {
+                curr_sum += (_matrix[curr_index + i] * other._matrix[curr_col + (curr_index * step)]);
+                ++curr_index;
+                if (curr_index == _cols) {
+                    curr_index = 0;
+                    mat_mul.push_back(curr_sum);
+                    curr_sum = 0;
+                    ++curr_col;
                 }
-
             }
-
         }
-
-//        for (uint i = 0; i < _cols; ++i) {
-//            for (uint j = 0; j < _cols; ++j) {
-//                mat_mul[i] += (_matrix[j + (i * static_cast<uint>(_rows))] *
-//                               other._matrix[i + (j * static_cast<uint>(other._rows))]);
-//            }
-//            ++curr_index;
-//        }
         return Matrix{mat_mul, _rows, other._cols};
     }
 
