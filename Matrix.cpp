@@ -8,10 +8,10 @@ using std::vector;
 namespace zich {
 
     Matrix::Matrix(const std::vector<double> &matrix, int rows, int cols)
-            : _matrix(matrix), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); }
+            : _matrix(matrix), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); this->setZeros(); }
 
     Matrix::Matrix(std::vector<double> &&matrix, int rows, int cols) // rvalue reference // move constructor
-            : _matrix(std::move(matrix)), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); }
+            : _matrix(std::move(matrix)), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); this->setZeros(); }
 
     Matrix Matrix::operator-() const {
         Matrix matrix{*this};
@@ -218,6 +218,10 @@ namespace zich {
             mat_sum += val;
         }
         return mat_sum;
+    }
+
+    void Matrix::setZeros() {
+        std::for_each(_matrix.begin(), _matrix.end(), [](double &val) { if (val == 0) { val = 0; }});
     }
 
 }
