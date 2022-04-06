@@ -141,9 +141,17 @@ TEST_CASE ("Unary and Binary Operators (between matrices)") {
     Matrix mat9{{1, 2, 3}, 3, 1};
     Matrix mat10{{1, 2, 3}, 1, 3};
 
-            SUBCASE("- operator") {
+            SUBCASE("- unary operator") {
                 CHECK(-mat1 == Matrix{{-1, 0, 0, 0, -1, 0, 0, 0, -1}, 3, 3});
                 CHECK(Matrix{{-12.5, -23.6, -34.7, -45.8, -56.9}, 5, 1} == -mat7);
+    }
+
+            SUBCASE("+ unary operator") {
+        Matrix mat11{{-1, 0, 0, 0, -1, 0, 0, 0, -1}, 3, 3};
+        Matrix mat12{{-0.0}, 1, 1};
+                CHECK(mat1 == +mat1);
+                CHECK(mat11 == +mat11);
+                CHECK(mat12 == +mat12);
     }
 
             SUBCASE("+= operator") {
@@ -266,5 +274,11 @@ TEST_CASE ("Output stream") {
                 CHECK(stream.str() == "[0 0 0]\n"
                                       "[0 0 0]\n"
                                       "[0 0 0]\n");
+    }
+
+            SUBCASE("Output 6") {
+        Matrix mat{{-0.0}, 1, 1};
+        stream << mat;
+                CHECK(stream.str() == "[0]\n");
     }
 }
