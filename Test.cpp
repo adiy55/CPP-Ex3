@@ -121,11 +121,10 @@ TEST_CASE ("Comparison Operators") {
     }
 
             SUBCASE(">= operator") {
-                CHECK_FALSE(mat1 >= mat2);
+                CHECK_FALSE(mat2 >= mat1);
                 CHECK(mat4 >= mat2);
                 CHECK_THROWS(mat2.operator>=(mat3));
     }
-
 
 }
 
