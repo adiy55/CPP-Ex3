@@ -43,9 +43,7 @@ namespace zich {
     }
 
     Matrix Matrix::operator+() const {
-        Matrix matrix{*this};
-        std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) { if (val < 0) { val = -val; }});
-        return matrix;
+        return Matrix{*this};
     }
 
     Matrix &Matrix::operator+=(const Matrix &other) {
@@ -139,12 +137,22 @@ namespace zich {
          *      cols -skip right += row
          *
          */
-        vector<double> mat_mul(0, static_cast<uint>(_rows * other._cols));
-//        uint curr_index = 0;
-//        for (int i = 0; i < _cols; ++i) {
-//            for (int j = 0; j < _cols; ++j) {
-//                mat_mul[curr_index] += (_matrix[static_cast<uint>(j + (i * _rows))] *
-//                                        other._matrix[static_cast<uint>(i + (j * other._rows))]);
+        vector<double> mat_mul(static_cast<uint>(_rows * other._cols), 0);
+        for (uint i = 0; i < other._cols; ++i) {
+            for (uint j = 0; j < _cols; ++j) {
+                for (uint k = 0; k < other._rows; ++k) {
+
+
+                }
+
+            }
+
+        }
+
+//        for (uint i = 0; i < _cols; ++i) {
+//            for (uint j = 0; j < _cols; ++j) {
+//                mat_mul[i] += (_matrix[j + (i * static_cast<uint>(_rows))] *
+//                               other._matrix[i + (j * static_cast<uint>(other._rows))]);
 //            }
 //            ++curr_index;
 //        }
@@ -180,7 +188,7 @@ namespace zich {
 
     Matrix operator*(double scalar, const Matrix &matrix) {
         Matrix res_matrix{matrix._matrix, matrix._rows, matrix._cols};
-        std::for_each(res_matrix._matrix.begin(), res_matrix._matrix.end(), [scalar](double &val) { val *= scalar; });
+        res_matrix *= scalar;
         return res_matrix;
     }
 
