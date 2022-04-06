@@ -14,7 +14,7 @@ namespace zich {
             : _matrix(std::move(matrix)), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); }
 
     Matrix Matrix::operator-() const {
-        Matrix matrix{_matrix, _rows, _cols};
+        Matrix matrix{*this};
         std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) { if (val != 0) { val = -val; }});
         return matrix;
     }
@@ -26,7 +26,7 @@ namespace zich {
 
     Matrix Matrix::operator+(const Matrix &other) const {
         checkDimensionsEq(_rows, _cols, other._rows, other._cols);
-        Matrix res_matrix{_matrix, _rows, _cols};
+        Matrix res_matrix{*this};
         for (uint i = 0; i < _matrix.size(); ++i) {
             res_matrix._matrix[i] += other._matrix[i];
         }
@@ -35,7 +35,7 @@ namespace zich {
 
     Matrix Matrix::operator-(const Matrix &other) const {
         checkDimensionsEq(_rows, _cols, other._rows, other._cols);
-        Matrix res_matrix{_matrix, _rows, _cols};
+        Matrix res_matrix{*this};
         for (uint i = 0; i < res_matrix._matrix.size(); ++i) {
             res_matrix._matrix[i] -= other._matrix[i];
         }
@@ -43,7 +43,9 @@ namespace zich {
     }
 
     Matrix Matrix::operator+() const {
-        return Matrix{{}, 0, 0};
+        Matrix matrix{*this};
+        std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) { if (val < 0) { val = -val; }});
+        return matrix;
     }
 
     Matrix &Matrix::operator+=(const Matrix &other) {
@@ -109,13 +111,13 @@ namespace zich {
 // postfix (i++)
 
     Matrix Matrix::operator++(int) {
-        Matrix mat_copy{_matrix, _rows, _cols};
+        Matrix mat_copy{*this};
         ++(*this);
         return mat_copy;
     }
 
     Matrix Matrix::operator--(int) {
-        Matrix mat_copy{_matrix, _rows, _cols};
+        Matrix mat_copy{*this};
         --(*this);
         return mat_copy;
     }
@@ -123,16 +125,29 @@ namespace zich {
     Matrix Matrix::operator*(const Matrix &other) const {
         checkDimensionsMul(_cols, other._rows);
         /*
-         * 123
+         * 0 1 2
+         * 3 4 5
          *
-         * 1
-         * 2
-         * 3
+         * 0 1 2
+         * 3 4 5
+         * 6 7 8
          *
+         *
+         * 2x3 3x3
+         *
+         * cols left
+         *      cols -skip right += row
          *
          */
         vector<double> mat_mul(0, static_cast<uint>(_rows * other._cols));
-//        mat_mul.reserve(static_cast<uint>(_rows * other._cols));
+//        uint curr_index = 0;
+//        for (int i = 0; i < _cols; ++i) {
+//            for (int j = 0; j < _cols; ++j) {
+//                mat_mul[curr_index] += (_matrix[static_cast<uint>(j + (i * _rows))] *
+//                                        other._matrix[static_cast<uint>(i + (j * other._rows))]);
+//            }
+//            ++curr_index;
+//        }
         return Matrix{mat_mul, _rows, other._cols};
     }
 
