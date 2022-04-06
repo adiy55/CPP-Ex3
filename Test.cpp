@@ -45,8 +45,9 @@ TEST_CASE ("Matrix Multiplication") {
     Matrix mat8{generateZeroMatrix(9, 9)};
 
             SUBCASE("Bad Input- wrong dimensions") {
+        Matrix mat9{{5}, 1, 1};
                 CHECK_THROWS(mat1 * mat2);
-                CHECK_THROWS(mat4 * mat3);
+                CHECK_THROWS(mat4 * mat9);
                 CHECK_THROWS(mat1 * mat6); // vector size is the same, different dimensions
     }
 
@@ -59,7 +60,7 @@ TEST_CASE ("Matrix Multiplication") {
 
             SUBCASE("*= matrix operator") {
                 CHECK_THROWS(mat1 *= mat2);
-                CHECK_THROWS(mat4 *= mat3);
+                CHECK_NOTHROW(mat4 *= mat3);
     }
 
 }
