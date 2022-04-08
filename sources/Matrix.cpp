@@ -181,7 +181,32 @@ namespace zich {
         return out;
     }
 
-    std::istream &operator>>(std::istream &in, const Matrix &matrix) {
+    std::istream &operator>>(std::istream &in, Matrix &matrix) {
+        matrix._matrix.clear();
+        double val = 0;
+        int row_len = 0;
+        int prev_col_len = -1;
+        int col_len = 0;
+        char c;
+        while (in >> c) {
+            if (!(c == '[' || c == ']' || c == ',')) break;
+            std::cout << "Curr char: " << c << '\n';
+            if (prev_col_len != -1 && prev_col_len != col_len) {
+                throw std::invalid_argument("Wrong dimensions!");
+            }
+            if (c == '[') {
+                prev_col_len = col_len;
+                col_len = 0;
+                ++row_len;
+                while (in >> val) {
+                    matrix._matrix.push_back(val);
+                    ++col_len;
+                }
+            }
+            in.clear();
+        }
+        matrix._rows = row_len;
+        matrix._cols = col_len;
         return in;
     }
 

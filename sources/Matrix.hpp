@@ -85,7 +85,7 @@ namespace zich {
 
         friend std::ostream &operator<<(std::ostream &out, const Matrix &matrix);
 
-        friend std::istream &operator>>(std::istream &in, const Matrix &matrix);
+        friend std::istream &operator>>(std::istream &in, Matrix &matrix);
 
         friend Matrix operator*(double scalar, const Matrix &matrix);
 
