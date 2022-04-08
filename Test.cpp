@@ -1,6 +1,6 @@
 #include <sstream>
 #include "doctest.h"
-#include "Matrix.hpp"
+#include "sources/Matrix.hpp"
 
 typedef unsigned int uint;
 
