@@ -8,16 +8,10 @@ using std::vector;
 namespace zich {
 
     Matrix::Matrix(const std::vector<double> &matrix, int rows, int cols)
-            : _matrix(matrix), _rows(rows), _cols(cols) {
-        checkInput(_matrix.size(), _rows, _cols);
-        this->setZeros();
-    }
+            : _matrix(matrix), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); }
 
     Matrix::Matrix(std::vector<double> &&matrix, int rows, int cols) // rvalue reference // move constructor
-            : _matrix(std::move(matrix)), _rows(rows), _cols(cols) {
-        checkInput(_matrix.size(), _rows, _cols);
-        this->setZeros();
-    }
+            : _matrix(std::move(matrix)), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); }
 
     Matrix Matrix::operator-() const {
         Matrix matrix{*this};
@@ -31,20 +25,14 @@ namespace zich {
     }
 
     Matrix Matrix::operator+(const Matrix &other) const {
-        checkDimensionsEq(_rows, _cols, other._rows, other._cols);
         Matrix res_matrix{*this};
-        for (uint i = 0; i < _matrix.size(); ++i) {
-            res_matrix._matrix[i] += other._matrix[i];
-        }
+        res_matrix.operator+=(other);
         return res_matrix;
     }
 
     Matrix Matrix::operator-(const Matrix &other) const {
-        checkDimensionsEq(_rows, _cols, other._rows, other._cols);
         Matrix res_matrix{*this};
-        for (uint i = 0; i < res_matrix._matrix.size(); ++i) {
-            res_matrix._matrix[i] -= other._matrix[i];
-        }
+        res_matrix.operator-=(other); // todo: check
         return res_matrix;
     }
 
@@ -146,7 +134,7 @@ namespace zich {
         vector<double> mat_mul;
         uint curr_index = 0;
         uint step = static_cast<uint>(other._cols);
-        uint curr_col;
+        uint curr_col = 0;
         double curr_sum = 0;
         for (uint i = 0; i < _matrix.size(); i += static_cast<uint>(_cols)) {
             curr_col = 0;
@@ -171,13 +159,19 @@ namespace zich {
 
 // friend functions
 
+    /*
+     * https://2019.cppconf-piter.ru/en/2019/spb/talks/45r2fxppvo0iabreclznd/
+     * https://www.codesynthesis.com/~boris/blog/2012/07/24/const-rvalue-references/#:~:text=Note%20the%20asymmetry%3A%20while%20a,const%20rvalue%20references%20pretty%20useless.
+     */
     std::ostream &operator<<(std::ostream &out, const Matrix &matrix) {
+        double tmp = 0;
         for (uint i = 0; i < matrix._rows; ++i) {
             out << "[";
             uint start_index = i * static_cast<uint>(matrix._cols);
             uint end_of_row_index = start_index + static_cast<uint>(matrix._cols);
             for (uint j = start_index; j < end_of_row_index; ++j) {
-                out << matrix._matrix[j];
+                tmp = matrix._matrix[j] == 0 ? 0 : matrix._matrix[j];
+                out << tmp;
                 if (j < end_of_row_index - 1) {
                     out << " ";
                 }
@@ -192,7 +186,7 @@ namespace zich {
     }
 
     Matrix operator*(double scalar, const Matrix &matrix) {
-        Matrix res_matrix{matrix._matrix, matrix._rows, matrix._cols};
+        Matrix res_matrix{matrix};
         res_matrix *= scalar;
         return res_matrix;
     }
@@ -223,10 +217,6 @@ namespace zich {
             mat_sum += val;
         }
         return mat_sum;
-    }
-
-    void Matrix::setZeros() {
-        std::for_each(_matrix.begin(), _matrix.end(), [](double &val) { if (val == 0) { val = 0; }});
     }
 
 }
