@@ -1,4 +1,5 @@
 #include "Matrix.hpp"
+#include <regex>
 
 typedef unsigned int uint;
 
@@ -183,30 +184,44 @@ namespace zich {
 
     std::istream &operator>>(std::istream &in, Matrix &matrix) {
         matrix._matrix.clear();
-        double val = 0;
-        int row_len = 0;
-        int prev_col_len = -1;
-        int col_len = 0;
-        char c;
-        while (in >> c) {
-            if (!(c == '[' || c == ']' || c == ',')) break;
-            std::cout << "Curr char: " << c << '\n';
-            if (prev_col_len != -1 && prev_col_len != col_len) {
-                throw std::invalid_argument("Wrong dimensions!");
-            }
-            if (c == '[') {
-                prev_col_len = col_len;
-                col_len = 0;
-                ++row_len;
-                while (in >> val) {
-                    matrix._matrix.push_back(val);
-                    ++col_len;
+        matrix._rows = 0;
+        matrix._cols = 0;
+        int row_counter = 0, col_counter = 0, prev_col_counter = -1;
+        double curr_num;
+        string str_input, curr_str;
+
+        std::regex expr("(\\[([-]{0,1}[0-9]+[.]{0,1}[ ]{0,1})+\\])");
+        std::smatch sm;
+
+        in.ignore(); // todo: explain
+        getline(in, str_input);
+
+        while (std::regex_search(str_input, sm, expr)) {
+            curr_str = sm.str();
+            std::cout << curr_str << '\n';
+            for (uint i = 1, start_index = 1; i < curr_str.size(); ++i) {
+                if (curr_str[i] == '-') ++start_index;
+                if (curr_str[i] == ' ' || curr_str[i] == ']') {
+                    std::cout << curr_str.substr(start_index, i - 1) << '\n';
+                    curr_num = std::stod(curr_str.substr(start_index, i - 1));
+                    matrix._matrix.push_back(curr_num);
+                    start_index = i + 1;
+                    ++col_counter;
                 }
             }
-            in.clear();
+            if (prev_col_counter != -1 && col_counter != prev_col_counter) {
+                throw std::runtime_error("Column dimensions do not match!");
+            }
+            ++row_counter;
+            prev_col_counter = col_counter;
+            col_counter = 0;
+            str_input = sm.suffix().str();
         }
-        matrix._rows = row_len;
-        matrix._cols = col_len;
+        if (matrix._matrix.empty()) {
+            throw std::runtime_error("Could not parse input!");
+        }
+        matrix._rows = row_counter;
+        matrix._cols = prev_col_counter;
         return in;
     }
 
