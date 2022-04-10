@@ -190,7 +190,8 @@ namespace zich {
         double curr_num;
         string str_input, curr_str;
 
-        std::regex expr("(\\[([-]{0,1}[0-9]+[.]{0,1}[ ]{0,1})+\\])");
+        // this website was useful for testing the regex: https://www.regextester.com/97722
+        std::regex expr("\\[([-]{0,1}[0-9]+[.]{0,1}[ ]{0,1})+\\]");
         std::smatch sm;
 
         in.ignore(); // todo: explain
@@ -200,9 +201,7 @@ namespace zich {
             curr_str = sm.str();
             std::cout << curr_str << '\n';
             for (uint i = 1, start_index = 1; i < curr_str.size(); ++i) {
-                if (curr_str[i] == '-') ++start_index;
                 if (curr_str[i] == ' ' || curr_str[i] == ']') {
-                    std::cout << curr_str.substr(start_index, i - 1) << '\n';
                     curr_num = std::stod(curr_str.substr(start_index, i - 1));
                     matrix._matrix.push_back(curr_num);
                     start_index = i + 1;
@@ -220,10 +219,12 @@ namespace zich {
         if (matrix._matrix.empty()) {
             throw std::runtime_error("Could not parse input!");
         }
+
         matrix._rows = row_counter;
         matrix._cols = prev_col_counter;
         return in;
     }
+
 
     Matrix operator*(double scalar, const Matrix &matrix) {
         Matrix res_matrix{matrix};
