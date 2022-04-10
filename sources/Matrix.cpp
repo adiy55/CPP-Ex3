@@ -155,6 +155,7 @@ namespace zich {
 
     Matrix &Matrix::operator*=(const Matrix &other) {
         checkDimensionsMul(_cols, other._rows);
+        _cols = other._rows;
         return *this;
     }
 
@@ -190,8 +191,15 @@ namespace zich {
         double curr_num;
         string str_input, curr_str;
 
-        // this website was useful for testing the regex: https://www.regextester.com/97722
-        std::regex expr("\\[([-]{0,1}[0-9]+[.]{0,1}[ ]{0,1})+\\]");
+        // these websites were useful for testing the regex: https://www.regextester.com/97722, https://regex101.com/
+//        std::regex expr("\\[([-]{0,1}[0-9]+[.]{0,1}[ ]{0,1})+\\]");
+//        std::regex expr("(\\[([-]{0,1}[0-9]+[.]{0,1}[ ]{0,1})+\\])+[^, ]{0,1}");
+//        std::regex expr{"\\[([-]{0,1}[0-9]+?:[.][0-9]+)?([ ]{1}[-]{0,1}[0-9]+(?:[.][0-9]+)?)+\\]"};
+//        std::regex expr{"\\[([-]?[0-9]+[.]?[0-9]*[ ]?)+\\]"};
+//        std::regex expr{"(\\[([-]?[0-9]+[.]?[0-9]*[ ]?)+\\]){1}([, \\[]([-]?[0-9]+[.]?[0-9]*[ ]?)+\\])*"};
+//        std::regex expr{R"((\[([-]?[0-9]+[.]?[0-9]*[ ]?)+\])([, \[]([-]?[0-9]+[.]?[0-9]*[ ]?)+\])*)"};
+//        std::regex expr{R"((\[\-?\d+(\.?\d*\s?)+\])([, \[]\-?\d+(\.?\d*\s?)+\])*)"};
+        std::regex expr{R"((\[\-?\d+(\.?\d*\s?)+\])([, \[]\-?\d+(\.?\d*\s?)+\])*)"}; // todo: 1.9.9
         std::smatch sm;
 
         in.ignore(); // todo: explain
@@ -216,7 +224,7 @@ namespace zich {
             col_counter = 0;
             str_input = sm.suffix().str();
         }
-        if (matrix._matrix.empty()) {
+        if (matrix._matrix.empty() || matrix._matrix.size() != row_counter * prev_col_counter) {
             throw std::runtime_error("Could not parse input!");
         }
 
