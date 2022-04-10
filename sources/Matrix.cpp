@@ -116,6 +116,12 @@ namespace zich {
     }
 
     Matrix Matrix::operator*(const Matrix &other) const {
+        Matrix mat_copy{*this};
+        mat_copy *= other;
+        return mat_copy;
+    }
+
+    Matrix &Matrix::operator*=(const Matrix &other) {
         checkDimensionsMul(_cols, other._rows);
         /*
          * 0 1 2
@@ -124,12 +130,6 @@ namespace zich {
          * 0 1 2
          * 3 4 5
          * 6 7 8
-         *
-         *
-         * 2x3 3x3
-         *
-         * cols left
-         *      cols -skip right += row
          *
          */
         vector<double> mat_mul;
@@ -150,12 +150,8 @@ namespace zich {
                 }
             }
         }
-        return Matrix{mat_mul, _rows, other._cols};
-    }
-
-    Matrix &Matrix::operator*=(const Matrix &other) {
-        checkDimensionsMul(_cols, other._rows);
-        _cols = other._rows;
+        _matrix.swap(mat_mul);
+        _cols = other._cols;
         return *this;
     }
 
