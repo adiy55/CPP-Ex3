@@ -266,6 +266,42 @@ namespace zich {
         return out;
     }
 
+    void Matrix::split(const string &str_input, vector<string> &input_rows) {
+        std::regex extract_rows{R"(\,\s)"};
+        // passing -1 as the submatch index parameter performs splitting
+        std::sregex_token_iterator
+                iter_start{str_input.begin(), str_input.end(), extract_rows, -1}, iter_end;
+
+        while (iter_start != iter_end) {
+            input_rows.push_back(iter_start->str());
+            ++iter_start;
+        }
+
+        int prev_num_count = -1, num_count = 0;
+        for (string &row: input_rows) {
+            for (char &c: row) {
+                if (c == ' ') {
+                    ++num_count;
+                }
+            }
+            if (prev_num_count != -1 && num_count != prev_num_count) {
+                throw std::runtime_error("Invalid column dimensions!");
+            }
+            prev_num_count = num_count;
+            num_count = 0;
+        }
+
+        std::regex check_rows{R"(\[(\-?\d+(\.\d+)?)(\s\-?\d+(\.\d+)?)*\])"};
+
+        for (const string &row: input_rows) {
+            if (!std::regex_match(row, check_rows)) {
+                throw std::runtime_error("Could not parse input!");
+            }
+
+        }
+
+    }
+
     std::istream &operator>>(std::istream &in, Matrix &matrix) {
         matrix._matrix.clear();
         matrix._rows = 0;
@@ -282,37 +318,72 @@ namespace zich {
 //        std::regex expr{"(\\[([-]?[0-9]+[.]?[0-9]*[ ]?)+\\]){1}([, \\[]([-]?[0-9]+[.]?[0-9]*[ ]?)+\\])*"};
 //        std::regex expr{R"((\[([-]?[0-9]+[.]?[0-9]*[ ]?)+\])([, \[]([-]?[0-9]+[.]?[0-9]*[ ]?)+\])*)"};
 //        std::regex expr{R"((\[\-?\d+(\.?\d*\s?)+\])([, \[]\-?\d+(\.?\d*\s?)+\])*)"};
-        std::regex expr{R"((\[\-?\d+(\.?\d*\s?)+\])([, \[]\-?\d+(\.?\d*\s?)+\])*)"}; // todo: 1.9.9
-        std::smatch sm;
+//        std::regex expr{R"((\[\-?\d+(\.?\d*\s?)+\])([, \[]\-?\d+(\.?\d*\s?)+\])*)"}; // todo: 1.9.9
+
+
+
+//        std::regex expr{R"((\[\-?\d+(\.\d+)?(\s\-?\d+(\.\d+)?)*\])+)"};
+//        std::regex expr{R"((\[(?:\-?\d+(?:\.\d+)?(?:\s\-?\d+(?:\.\d+)?)*)\])((\,\s)\[\2\])*)"};
+//        std::smatch sm;
+
+
+
 
         in.ignore(); // todo: explain
         getline(in, str_input);
 
-        while (std::regex_search(str_input, sm, expr)) {
-            curr_str = sm.str();
-            std::cout << curr_str << '\n';
-            for (uint i = 1, start_index = 1; i < curr_str.size(); ++i) {
-                if (curr_str[i] == ' ' || curr_str[i] == ']') {
-                    curr_num = std::stod(curr_str.substr(start_index, i - 1));
-                    matrix._matrix.push_back(curr_num);
-                    start_index = i + 1;
-                    ++col_counter;
+        vector<string> input_rows;
+
+        Matrix::split(str_input, input_rows);
+
+//        std::regex get_nums{R"(\-?\d+(\.\d+)?)"};
+        std::regex extract_from_brackets{R"((?<=\[).+?(?=\]))"};
+        std::regex get_nums{R"(\s)"};
+        std::smatch sm;
+        for (string &row: input_rows) {
+            // todo: regex on spaces
+            std::regex_match(row, sm, extract_from_brackets);
+            if (sm.size() == 1) {
+                string curr =  sm[0].str();
+
+                std::sregex_token_iterator
+                        iter_start{curr.begin(), curr.end(), extract_from_brackets}, iter_end;
+                while(iter_start != iter_end){
+                    std::cout << iter_start->str() << '\n';
+                    iter_start++;
                 }
+
             }
-            if (prev_col_counter != -1 && col_counter != prev_col_counter) {
-                throw std::runtime_error("Column dimensions do not match!");
-            }
-            ++row_counter;
-            prev_col_counter = col_counter;
-            col_counter = 0;
-            str_input = sm.suffix().str();
-        }
-        if (matrix._matrix.empty() || matrix._matrix.size() != row_counter * prev_col_counter) {
-            throw std::runtime_error("Could not parse input!");
+//                matrix._matrix.push_back(std::stod(iter_start->str()));         }
         }
 
-        matrix._rows = row_counter;
-        matrix._cols = prev_col_counter;
+
+
+//        while (std::regex_search(str_input, sm, expr)) {
+//            curr_str = sm.str();
+//            std::cout << curr_str << '\n';
+//            for (uint i = 1, start_index = 1; i < curr_str.size(); ++i) {
+//                if (curr_str[i] == ' ' || curr_str[i] == ']') {
+//                    curr_num = std::stod(curr_str.substr(start_index, i - 1));
+//                    matrix._matrix.push_back(curr_num);
+//                    start_index = i + 1;
+//                    ++col_counter;
+//                }
+//            }
+//            if (prev_col_counter != -1 && col_counter != prev_col_counter) {
+//                throw std::runtime_error("Column dimensions do not match!");
+//            }
+//            ++row_counter;
+//            prev_col_counter = col_counter;
+//            col_counter = 0;
+//            str_input = sm.suffix().str();
+//        }
+//        if (matrix._matrix.empty() || matrix._matrix.size() != row_counter * prev_col_counter) {
+//            throw std::runtime_error("Could not parse input!");
+//        }
+//
+//        matrix._rows = row_counter;
+//        matrix._cols = prev_col_counter;
         return in;
     }
 

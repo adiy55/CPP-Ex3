@@ -28,6 +28,8 @@ namespace zich {
 
         double calculateSum() const;
 
+        static void split(const std::string& str_input, std::vector<std::string>& input_rows);
+
     public:
 
         // https://www.reddit.com/r/cpp_questions/comments/swaxw2/passing_a_vector_to_constructor/
