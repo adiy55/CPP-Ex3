@@ -8,39 +8,69 @@ using std::vector;
 
 namespace zich {
 
+    /**
+     * Lvalue constructor.
+     */
     Matrix::Matrix(const std::vector<double> &matrix, int rows, int cols)
             : _matrix(matrix), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); }
 
+    /**
+     * Move constructor for rvalue vectors.
+     */
     Matrix::Matrix(std::vector<double> &&matrix, int rows, int cols) // rvalue reference // move constructor
             : _matrix(std::move(matrix)), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); }
 
+    /**
+     * @return new matrix with flipped signs
+     */
     Matrix Matrix::operator-() const {
-        Matrix matrix{*this};
-        std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) { if (val != 0) { val = -val; }});
+        Matrix matrix{*this}; // todo: check which constructor this uses
+        matrix.operator*=(-1);
+//        std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) { if (val != 0) { val = -val; }});
         return matrix;
     }
 
+    /**
+     * @param scalar double
+     * @return matrix reference with the multiplied entries
+     */
     Matrix &Matrix::operator*=(double scalar) {
         std::for_each(_matrix.begin(), _matrix.end(), [scalar](double &val) { val *= scalar; });
         return *this;
     }
 
+    /**
+     *
+     * @param other matrix of the same dimensions
+     * @return new matrix with the calculated values
+     */
     Matrix Matrix::operator+(const Matrix &other) const {
         Matrix res_matrix{*this};
         res_matrix.operator+=(other);
         return res_matrix;
     }
 
+    /**
+     * @param other matrix of the same dimensions
+     * @return new matrix with the calculated values
+     */
     Matrix Matrix::operator-(const Matrix &other) const {
         Matrix res_matrix{*this};
         res_matrix.operator-=(other); // todo: check
         return res_matrix;
     }
 
+    /**
+     * @return copy of the matrix with same values
+     */
     Matrix Matrix::operator+() const {
         return Matrix{*this};
     }
 
+    /**
+     * @param other matrix of the same dimensions
+     * @return reference of the matrix with the calculated values
+     */
     Matrix &Matrix::operator+=(const Matrix &other) {
         checkDimensionsEq(_rows, _cols, other._rows, other._cols);
         for (uint i = 0; i < _matrix.size(); ++i) {
@@ -49,6 +79,10 @@ namespace zich {
         return *this;
     }
 
+    /**
+     * @param other matrix of the same dimensions
+     * @return reference of the matrix with the subtracted entries
+     */
     Matrix &Matrix::operator-=(const Matrix &other) {
         checkDimensionsEq(_rows, _cols, other._rows, other._cols);
         for (uint i = 0; i < _matrix.size(); ++i) {
@@ -57,24 +91,44 @@ namespace zich {
         return *this;
     }
 
+    /**
+     * @param other matrix of the same dimensions
+     * @return true if the sum of the entries is greater
+     */
     bool Matrix::operator>(const Matrix &other) const {
         checkDimensionsEq(_rows, _cols, other._rows, other._cols);
-        return (this->calculateSum() > other.calculateSum());
+        return (this->calculateSum() > other.calculateSum()); // helper function calculates the sums
     }
 
+    /**
+     * @param other matrix of the same dimensions
+     * @return true if the sum of entries is greater or equal
+     */
     bool Matrix::operator>=(const Matrix &other) const {
         return (*this > other || *this == other);
     }
 
+    /**
+     * @param other matrix of the same dimensions
+     * @return true if the sum of entries is smaller
+     */
     bool Matrix::operator<(const Matrix &other) const {
         checkDimensionsEq(_rows, _cols, other._rows, other._cols);
         return (this->calculateSum() < other.calculateSum());
     }
 
+    /**
+     * @param other matrix of the same dimensions
+     * @return true if the sum of entries is smaller or equal
+     */
     bool Matrix::operator<=(const Matrix &other) const {
         return (*this < other || *this == other);
     }
 
+    /**
+     * @param other matrix of the same dimensions
+     * @return true if all entries are equal
+     */
     bool Matrix::operator==(const Matrix &other) const {
         checkDimensionsEq(_rows, _cols, other._rows, other._cols);
         for (uint i = 0; i < _matrix.size(); ++i) {
@@ -85,17 +139,27 @@ namespace zich {
         return true;
     }
 
-    bool Matrix::operator!=(const Matrix &other) const {
+    /**
+     * @param other matrix of the same dimensions
+     * @return true if there exists an entry with different values
+     */
+    bool Matrix::operator!=(const Matrix &other) const { // todo: test case with 0 and -0
         return !((*this) == other);
     }
 
 // prefix (++i)
 
+    /**
+     * @return matrix reference with incremented values
+     */
     Matrix &Matrix::operator++() {
         std::for_each(_matrix.begin(), _matrix.end(), [](double &val) { val++; });
         return *this;
     }
 
+    /**
+     * @return matrix reference with decremented entries
+     */
     Matrix &Matrix::operator--() {
         std::for_each(_matrix.begin(), _matrix.end(), [](double &val) { val--; });
         return *this;
@@ -103,18 +167,28 @@ namespace zich {
 
 // postfix (i++)
 
+    /**
+     * @return new matrix with old values (actual matrix is incremented)
+     */
     Matrix Matrix::operator++(int) {
         Matrix mat_copy{*this};
         ++(*this);
         return mat_copy;
     }
 
+    /**
+     * @return new matrix with old values (actual matrix is decremented)
+     */
     Matrix Matrix::operator--(int) {
         Matrix mat_copy{*this};
         --(*this);
         return mat_copy;
     }
 
+    /**
+     * @param other matrix of the valid dimensions for matrix multiplication (cols = other.rows)
+     * @return new matrix with dimensions rows x other.cols and matrix multiplication valuesl
+     */
     Matrix Matrix::operator*(const Matrix &other) const {
         Matrix mat_copy{*this};
         mat_copy *= other;
@@ -132,8 +206,8 @@ namespace zich {
          * 6 7 8
          *
          */
-        vector<double> mat_mul;
-        uint curr_index = 0;
+        vector<double> mat_mul; // init new result vector
+        uint curr_index = 0; //
         uint step = static_cast<uint>(other._cols);
         uint curr_col = 0;
         double curr_sum = 0;
@@ -230,6 +304,12 @@ namespace zich {
     }
 
 
+    /**
+     * friend function for scalar on left side
+     * @param scalar double
+     * @param matrix matrix to be multiplied
+     * @return new matrix with multiplied entries
+     */
     Matrix operator*(double scalar, const Matrix &matrix) {
         Matrix res_matrix{matrix};
         res_matrix *= scalar;
@@ -238,24 +318,47 @@ namespace zich {
 
 // class methods and helper functions
 
+    /**
+     * Checks that the matrix has valid dimensions.
+     * This is called in the constructors.
+     * @param mat_size
+     * @param rows
+     * @param cols
+     */
     void Matrix::checkInput(uint mat_size, int rows, int cols) {
         if (rows < 1 || cols < 1 || mat_size != (rows * cols)) {
             throw std::invalid_argument("Invalid matrix size!");
         }
     }
 
+    /**
+     * Checks that the dimensions are valid for matrix multiplication.
+     * @param mat1_cols
+     * @param mat2_rows
+     */
     void Matrix::checkDimensionsMul(int mat1_cols, int mat2_rows) {
         if (mat1_cols != mat2_rows) {
             throw std::invalid_argument("Invalid dimensions for matrix multiplication!");
         }
     }
 
+    /**
+     * Checks that the dimensions are equal for addition, subtraction, and comparison operators.
+     * @param rows1
+     * @param cols1
+     * @param rows2
+     * @param cols2
+     */
     void Matrix::checkDimensionsEq(int rows1, int cols1, int rows2, int cols2) {
         if (rows1 != rows2 || cols1 != cols2) {
             throw std::invalid_argument("Invalid dimensions for matrix addition or subtraction!");
         }
     }
 
+    /**
+     * Used in comparison functions.
+     * @return sum of matrix entries
+     */
     double Matrix::calculateSum() const {
         double mat_sum = 0;
         for (const double &val: _matrix) {
