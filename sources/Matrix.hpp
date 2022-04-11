@@ -42,6 +42,8 @@ namespace zich {
         // https://abseil.io/tips/109
         Matrix &operator*=(double scalar);
 
+        Matrix operator*(double scalar) const;
+
         Matrix operator+(const Matrix &other) const;
 
         Matrix operator-(const Matrix &other) const;

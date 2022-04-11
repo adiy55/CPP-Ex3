@@ -40,6 +40,16 @@ namespace zich {
     }
 
     /**
+     * @param scalar double
+     * @return new matrix with the multiplied entries
+     */
+    Matrix Matrix::operator*(double scalar) const {
+        Matrix res_mat{*this};
+        res_mat.operator*=(scalar);
+        return res_mat;
+    }
+
+    /**
      *
      * @param other matrix of the same dimensions
      * @return new matrix with the calculated values
@@ -153,7 +163,7 @@ namespace zich {
      * @return matrix reference with incremented values
      */
     Matrix &Matrix::operator++() {
-        std::for_each(_matrix.begin(), _matrix.end(), [](double &val) { val++; });
+        std::for_each(_matrix.begin(), _matrix.end(), [](double &val) { ++val; });
         return *this;
     }
 
@@ -161,7 +171,7 @@ namespace zich {
      * @return matrix reference with decremented entries
      */
     Matrix &Matrix::operator--() {
-        std::for_each(_matrix.begin(), _matrix.end(), [](double &val) { val--; });
+        std::for_each(_matrix.begin(), _matrix.end(), [](double &val) { --val; });
         return *this;
     }
 
@@ -248,7 +258,10 @@ namespace zich {
                     out << " ";
                 }
             }
-            out << "]\n";
+            out << "]";
+            if (i < matrix._rows - 1) {
+                out << '\n';
+            }
         }
         return out;
     }
