@@ -6,7 +6,7 @@ typedef unsigned int uint;
 
 using namespace zich;
 
-const std::vector<double> identity = {1, 0, 0, 0, 1, 0, 0, 0, 1}; // global because this is used frequently
+const std::vector<double> identity{1, 0, 0, 0, 1, 0, 0, 0, 1}; // global because this is used frequently
 
 /**
  * Helper function for tests.
@@ -52,10 +52,15 @@ TEST_CASE ("Matrix Multiplication") {
     }
 
             SUBCASE("Good Input- valid dimensions") {
+        Matrix matrix9{{0.0}, 1, 1};
+        Matrix matrix10{{-0.0}, 1, 1};
+        Matrix res{matrix9 * matrix10};
+                CHECK((res == matrix9) && (res == matrix10)); // 0.0 == -0.0
                 CHECK_NOTHROW(mat2 * mat1);
                 CHECK_NOTHROW(mat3 * mat4);
                 CHECK((mat1 * mat5) == (16.4 * mat1));
                 CHECK((mat6 * mat7) == mat8);
+
     }
 
             SUBCASE("*= matrix operator") {
@@ -99,6 +104,7 @@ TEST_CASE ("Comparison Operators") {
                 CHECK(mat1 != mat2);
                 CHECK(mat1 != mat4);
                 CHECK_THROWS(mat2.operator!=(mat3));
+                CHECK(Matrix{{0.0}, 1, 1} == Matrix{{-0.0}, 1, 1}); // -0.0 == 0.0
     }
 
             SUBCASE("< operator") {
@@ -281,5 +287,31 @@ TEST_CASE ("Output stream") {
         Matrix mat{{-0.0}, 1, 1};
         stream << mat;
                 CHECK(stream.str() == "[0]\n");
+    }
+}
+
+
+TEST_CASE ("Input Stream") {
+    std::stringstream stream;
+    Matrix matrix{{0}, 1, 1};
+
+            SUBCASE("Input 1") {
+        stream << "[-0.0]\n";
+                CHECK_NOTHROW(stream >> matrix);
+    }
+
+            SUBCASE("Input 2") {
+        stream << "[1.1.55]\n";
+                CHECK_THROWS(stream >> matrix);
+    }
+
+            SUBCASE("Input 3") {
+        stream << "[-1 0 0], [-10 0]\n";
+                CHECK_THROWS(stream >> matrix);
+    }
+
+            SUBCASE("Input 4") {
+        stream << "[1,]\n";
+                CHECK_THROWS(stream >> matrix);
     }
 }
