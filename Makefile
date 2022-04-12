@@ -41,5 +41,5 @@ valgrind: test
 	valgrind --tool=memcheck $(VALGRIND_FLAGS) ./test 2>&1 | { egrep "lost| at " || true; }
 
 clean:
-	rm -f $(OBJECTS) *.o test* 
+	rm -f $(OBJECTS) *.o test*
 	rm -f StudentTest*.cpp
