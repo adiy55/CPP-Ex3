@@ -1,5 +1,8 @@
-#include "Matrix.hpp"
+#include <iostream>
+#include <vector>
+#include <string>
 #include <regex>
+#include "Matrix.hpp"
 
 typedef unsigned int uint;
 
@@ -18,7 +21,7 @@ namespace zich {
     /**
      * Lvalue constructor.
      */
-    Matrix::Matrix(const std::vector<double> &matrix, int rows, int cols) // todo: default ctr?
+    Matrix::Matrix(const std::vector<double> &matrix, int rows, int cols)
             : _matrix(matrix), _rows(rows), _cols(cols) { checkInput(_matrix.size(), _rows, _cols); }
 
     /**
@@ -140,7 +143,7 @@ namespace zich {
      * @param other matrix of the same dimensions
      * @return true if there exists an entry with different values
      */
-    bool Matrix::operator!=(const Matrix &other) const { // todo: test case with 0 and -0
+    bool Matrix::operator!=(const Matrix &other) const {
         return !((*this) == other);
     }
 
@@ -186,8 +189,14 @@ namespace zich {
      * @param scalar double
      * @return matrix reference with the multiplied entries
      */
+    /*
+     * https://www.cprogramming.com/c++11/c++11-lambda-closures.html
+     * Explains lambda and specifically captures.
+     * In the lambda below, only scalar is captured by making a copy.
+     * The lambda in for_each defines what function to apply to each element in _matrix.
+     */
     Matrix &Matrix::operator*=(double scalar) {
-        std::for_each(_matrix.begin(), _matrix.end(), [scalar](double &val) { val *= scalar; });
+        std::for_each(_matrix.begin(), _matrix.end(), [&scalar](double &val) { val *= scalar; });
         return *this;
     }
 
@@ -225,7 +234,7 @@ namespace zich {
         vector<double> mat_mul; // init new result vector
         uint shared_index = 0; // shared_index -> left mat col = right mat row
         uint right_mat_step = static_cast<uint>(other._cols); // number of indices to skip to next row in column
-        uint right_mat_col; // current column number of right matrix (for inner loop)
+        uint right_mat_col = 0; // current column number of right matrix (for inner loop)
         double curr_sum = 0; // sum of current entry
         for (uint i = 0; i < _matrix.size(); i += static_cast<uint>(_cols)) { // loop left matrix, i->skips to next row
             right_mat_col = 0; // start from first column in right matrix
@@ -260,7 +269,7 @@ namespace zich {
      */
     Matrix operator*(double scalar, const Matrix &matrix) {
         Matrix res_matrix{matrix};
-        res_matrix *= scalar;
+        res_matrix.operator*=(scalar);
         return res_matrix;
     }
 
@@ -272,7 +281,7 @@ namespace zich {
      * Print matrix. Each row is in brackets and there is a newline in between rows.
      */
     std::ostream &operator<<(std::ostream &out, const Matrix &matrix) {
-        double curr_val;
+        double curr_val = 0;
         for (uint i = 0; i < matrix._rows; ++i) { // loop rows
             out << "[";
             uint start_index = i * static_cast<uint>(matrix._cols); // start index of the ith row
@@ -331,8 +340,9 @@ namespace zich {
         */
     void Matrix::cinSplitRows(const string &str_input, vector<string> &input_rows) {
         std::regex extract_rows{R"(\,\s)"};
-        // passing -1 as the submatch index parameter performs splitting
-        std::sregex_token_iterator iter_start{str_input.begin(), str_input.end(), extract_rows, -1}, iter_end;
+        // when sub-match index parameter is -1 -> performs splitting
+        std::sregex_token_iterator iter_start{str_input.begin(), str_input.end(), extract_rows, -1};
+        std::sregex_token_iterator iter_end;
         while (iter_start != iter_end) {
             input_rows.push_back(iter_start->str());
             ++iter_start;
@@ -358,7 +368,8 @@ namespace zich {
      * @return number of columns
      */
     int Matrix::cinColumnsCheck(vector<string> &input_rows) {
-        int prev_num_count = -1, num_count = 1; // num_count starts from 1 (one value does not have spaces in between)
+        int prev_num_count = -1;
+        int num_count = 1; // num_count starts from 1 (one value does not have spaces in between)
         for (const string &row: input_rows) {
             for (const char &c: row) {
                 if (c == ' ') {
@@ -377,12 +388,18 @@ namespace zich {
     /**
      * Split input rows by spaces and append to the matrix vector.
      */
+    /*
+     * std::regex_token_iterator: https://en.cppreference.com/w/cpp/regex/regex_token_iterator
+     * "accesses the individual sub-matches of every match of a regular expression"
+     */
     void Matrix::cinInsertNumbers(vector<double> &new_mat, vector<string> &input_rows) {
         std::regex get_nums{R"(\s)"};
         for (string &row: input_rows) {
             // start iterator from +1 and end at -1 to ignore the brackets
-            // safe to assume since this helper function is called after the rows and split and input is validated
-            std::sregex_token_iterator iter_start{row.begin() + 1, row.end() - 1, get_nums, -1}, iter_end;
+            // safe to assume since this helper function is called after the rows are split and input is validated
+            // iter_end is the end of sequence (default constructor)
+            std::sregex_token_iterator iter_start{row.begin() + 1, row.end() - 1, get_nums, -1};
+            std::sregex_token_iterator iter_end;
             while (iter_start != iter_end) {
                 new_mat.push_back(std::stod(iter_start->str()));
                 ++iter_start;
