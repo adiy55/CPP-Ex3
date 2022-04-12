@@ -1,28 +1,36 @@
-#include "sources/Matrix.hpp"
+#include <iostream>
+#include <vector>
 #include <limits>
+#include "sources/Matrix.hpp"
 
 using namespace zich;
 using std::cin;
 using std::cout;
 using std::exception;
+using std::vector;
 
 void preset(const std::vector<double> &identity);
 
 void userInput(Matrix &);
 
+// To compile program run: clang++-9 -std=c++2a sources/*.cpp Main.cpp -Isources -o main -g
 int main() {
-    const std::vector<double> identity{1, 0, 0, 0, 1, 0, 0, 0, 1};
+    const vector<double> identity{1, 0, 0, 0, 1, 0, 0, 0, 1};
     Matrix matrix{identity, 3, 3};
     int mode;
     while (cin) {
-        cout << "For preset input enter 1\nFor user input enter 2\nEnter any other character to exit\n";
+        cout << "For preset input enter 1\nFor user input enter 2\nTo print current matrix enter 3\n"
+                "Enter any other character to exit\n";
         cin >> mode;
         // https://www.tutorialspoint.com/what-is-the-use-of-cin-ignore-in-cplusplus
-        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //clear buffer before taking new line
+        // https://stackoverflow.com/questions/25020129/cin-ignorenumeric-limitsstreamsizemax-n
+        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // clear buffer before taking new line
         if (mode == 1) {
             preset(identity);
         } else if (mode == 2) {
             userInput(matrix);
+        } else if (mode == 3) {
+            cout << "Current matrix is:\n" << matrix << '\n';
         } else {
             cout << "Exiting program...\n";
             return 0;
@@ -31,7 +39,7 @@ int main() {
     return 0;
 }
 
-void preset(const std::vector<double> &identity) {
+void preset(const vector<double> &identity) {
     int selection;
     cout << "Select:\n1 = 5x5 Identity Matrix | 2 = 4x4 Diagonal Matrix | 3 = 3x3 Symmetric Matrix | "
             "4 = Matrix Multiplication Demo\n";
