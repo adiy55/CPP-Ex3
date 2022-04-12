@@ -37,25 +37,6 @@ namespace zich {
     }
 
     /**
-     * @param scalar double
-     * @return matrix reference with the multiplied entries
-     */
-    Matrix &Matrix::operator*=(double scalar) {
-        std::for_each(_matrix.begin(), _matrix.end(), [scalar](double &val) { val *= scalar; });
-        return *this;
-    }
-
-    /**
-     * @param scalar double
-     * @return new matrix with the multiplied entries
-     */
-    Matrix Matrix::operator*(double scalar) const {
-        Matrix res_mat{*this};
-        res_mat.operator*=(scalar);
-        return res_mat;
-    }
-
-    /**
      *
      * @param other matrix of the same dimensions
      * @return new matrix with the calculated values
@@ -72,7 +53,7 @@ namespace zich {
      */
     Matrix Matrix::operator-(const Matrix &other) const {
         Matrix res_matrix{*this};
-        res_matrix.operator-=(other); // todo: check
+        res_matrix.operator-=(other);
         return res_matrix;
     }
 
@@ -163,9 +144,8 @@ namespace zich {
         return !((*this) == other);
     }
 
-// prefix (++i)
-
     /**
+     * Prefix increment.
      * @return matrix reference with incremented values
      */
     Matrix &Matrix::operator++() {
@@ -174,6 +154,7 @@ namespace zich {
     }
 
     /**
+     * Prefix decrement.
      * @return matrix reference with decremented entries
      */
     Matrix &Matrix::operator--() {
@@ -181,9 +162,8 @@ namespace zich {
         return *this;
     }
 
-// postfix (i++)
-
     /**
+     * Postfix increment.
      * @return new matrix with old values (actual matrix is incremented)
      */
     Matrix Matrix::operator++(int) {
@@ -193,6 +173,7 @@ namespace zich {
     }
 
     /**
+     * Postfix decrement.
      * @return new matrix with old values (actual matrix is decremented)
      */
     Matrix Matrix::operator--(int) {
@@ -202,12 +183,31 @@ namespace zich {
     }
 
     /**
+     * @param scalar double
+     * @return matrix reference with the multiplied entries
+     */
+    Matrix &Matrix::operator*=(double scalar) {
+        std::for_each(_matrix.begin(), _matrix.end(), [scalar](double &val) { val *= scalar; });
+        return *this;
+    }
+
+    /**
+     * @param scalar double
+     * @return new matrix with the multiplied entries
+     */
+    Matrix Matrix::operator*(double scalar) const {
+        Matrix res_mat{*this};
+        res_mat.operator*=(scalar);
+        return res_mat;
+    }
+
+    /**
      * @param other matrix with valid dimensions for matrix multiplication (_cols = other._rows)
      * @return new matrix with dimensions (_rows x other._cols) and matrix multiplication values
      */
     Matrix Matrix::operator*(const Matrix &other) const {
         Matrix mat_copy{*this};
-        mat_copy *= other;
+        mat_copy.operator*=(other);
         return mat_copy;
     }
 
@@ -248,7 +248,9 @@ namespace zich {
         return *this;
     }
 
+// ******************
 // friend functions
+// ******************
 
     /**
      * friend function for scalar on left side
@@ -320,8 +322,9 @@ namespace zich {
         return in;
     }
 
-
-// class methods and helper functions
+// *******************************************
+// private class methods and helper functions
+// *******************************************
 
     /**
         * Split input string by rows and insert into a vector.
@@ -377,6 +380,8 @@ namespace zich {
     void Matrix::cinInsertNumbers(vector<double> &new_mat, vector<string> &input_rows) {
         std::regex get_nums{R"(\s)"};
         for (string &row: input_rows) {
+            // start iterator from +1 and end at -1 to ignore the brackets
+            // safe to assume since this helper function is called after the rows and split and input is validated
             std::sregex_token_iterator iter_start{row.begin() + 1, row.end() - 1, get_nums, -1}, iter_end;
             while (iter_start != iter_end) {
                 new_mat.push_back(std::stod(iter_start->str()));
