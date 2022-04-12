@@ -242,13 +242,13 @@ TEST_CASE ("Output stream") {
         stream << mat;
                 CHECK(stream.str() == "[1 0 0]\n"
                                       "[0 1 0]\n"
-                                      "[0 0 1]\n");
+                                      "[0 0 1]");
     }
 
             SUBCASE("Output 2") {
         Matrix mat{{11.5, 22.6, 33.7, 44.8, 55.9}, 1, 5};
         stream << mat;
-                CHECK(stream.str() == "[11.5 22.6 33.7 44.8 55.9]\n");
+                CHECK(stream.str() == "[11.5 22.6 33.7 44.8 55.9]");
     }
 
             SUBCASE("Output 3") {
@@ -263,7 +263,7 @@ TEST_CASE ("Output stream") {
                                       "[7]\n"
                                       "[8]\n"
                                       "[9]\n"
-                                      "[10]\n");
+                                      "[10]");
     }
 
             SUBCASE("Output 4") {
@@ -272,7 +272,7 @@ TEST_CASE ("Output stream") {
                 CHECK(stream.str() == "[5 8 24]\n"
                                       "[30 23 45]\n"
                                       "[16 -5.7 0]\n"
-                                      "[0 -4 7]\n");
+                                      "[0 -4 7]");
     }
 
             SUBCASE("Output 5") {
@@ -280,7 +280,7 @@ TEST_CASE ("Output stream") {
         stream << mat;
                 CHECK(stream.str() == "[0 0 0]\n"
                                       "[0 0 0]\n"
-                                      "[0 0 0]\n");
+                                      "[0 0 0]");
     }
 
             SUBCASE("Output 6") {
