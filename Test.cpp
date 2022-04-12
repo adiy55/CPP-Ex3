@@ -55,7 +55,7 @@ TEST_CASE ("Matrix Multiplication") {
         Matrix matrix9{{0.0}, 1, 1};
         Matrix matrix10{{-0.0}, 1, 1};
         Matrix res{matrix9 * matrix10};
-                CHECK((res == matrix9) && (res == matrix10)); // 0.0 == -0.0
+                CHECK(bool ((res == matrix9) && (res == matrix10))); // 0.0 == -0.0
                 CHECK_NOTHROW(mat2 * mat1);
                 CHECK_NOTHROW(mat3 * mat4);
                 CHECK((mat1 * mat5) == (16.4 * mat1));
