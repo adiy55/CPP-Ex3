@@ -28,13 +28,13 @@ namespace zich {
 
         double calculateSum() const;
 
-        static void cinSplitRows(const std::string& str_input, std::vector<std::string>& input_rows);
+        static void cinSplitRows(const std::string &str_input, std::vector<std::string> &input_rows);
 
         static void cinRowsCheck(std::vector<std::string> &input_rows);
 
         static int cinColumnsCheck(std::vector<std::string> &input_rows);
 
-        static void cinInsertNumbers(Matrix &matrix, std::vector<std::string> &input_rows);
+        static void cinInsertNumbers(std::vector<double> &new_mat, std::vector<std::string> &input_rows);
 
     public:
 
@@ -93,11 +93,11 @@ namespace zich {
 
         // friend functions
 
+        friend Matrix operator*(double scalar, const Matrix &matrix);
+
         friend std::ostream &operator<<(std::ostream &out, const Matrix &matrix);
 
         friend std::istream &operator>>(std::istream &in, Matrix &matrix);
-
-        friend Matrix operator*(double scalar, const Matrix &matrix);
 
     };
 }

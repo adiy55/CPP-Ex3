@@ -8,6 +8,13 @@ using std::vector;
 
 namespace zich {
 
+    /*
+     * About constructors:
+     * Matrix matrix{*this}; calls copy constructor
+     * Matrix matrix{_matrix, _rows, _cols}; calls lvalue constructor
+     * Matrix matrix{{...}, (rows), (cols)}; calls move constructor
+     */
+
     /**
      * Lvalue constructor.
      */
@@ -24,9 +31,8 @@ namespace zich {
      * @return new matrix with flipped signs
      */
     Matrix Matrix::operator-() const {
-        Matrix matrix{*this}; // todo: check which constructor this uses
+        Matrix matrix{*this};
         matrix.operator*=(-1);
-//        std::for_each(matrix._matrix.begin(), matrix._matrix.end(), [](double &val) { if (val != 0) { val = -val; }});
         return matrix;
     }
 
@@ -196,8 +202,8 @@ namespace zich {
     }
 
     /**
-     * @param other matrix of the valid dimensions for matrix multiplication (cols = other.rows)
-     * @return new matrix with dimensions rows x other.cols and matrix multiplication valuesl
+     * @param other matrix with valid dimensions for matrix multiplication (_cols = other._rows)
+     * @return new matrix with dimensions (_rows x other._cols) and matrix multiplication values
      */
     Matrix Matrix::operator*(const Matrix &other) const {
         Matrix mat_copy{*this};
@@ -205,143 +211,44 @@ namespace zich {
         return mat_copy;
     }
 
+    /*
+     * 0 1 2    0 1 2
+     * 3 4 5    3 4 5
+     *          6 7 8
+     */
+    /**
+     * @param other matrix with valid dimensions for matrix multiplication (_cols = other._rows)
+     * @return matrix reference with updated dimensions (_rows x other._cols) and matrix multiplication values
+     */
     Matrix &Matrix::operator*=(const Matrix &other) {
         checkDimensionsMul(_cols, other._rows);
-        /*
-         * 0 1 2
-         * 3 4 5
-         *
-         * 0 1 2
-         * 3 4 5
-         * 6 7 8
-         *
-         */
         vector<double> mat_mul; // init new result vector
-        uint curr_index = 0; //
-        uint step = static_cast<uint>(other._cols);
-        uint curr_col = 0;
-        double curr_sum = 0;
-        for (uint i = 0; i < _matrix.size(); i += static_cast<uint>(_cols)) {
-            curr_col = 0;
-            for (uint j = 0; j < other._matrix.size(); ++j) {
-                curr_sum += (_matrix[curr_index + i] * other._matrix[curr_col + (curr_index * step)]);
-                ++curr_index;
-                if (curr_index == _cols) {
-                    curr_index = 0;
-                    mat_mul.push_back(curr_sum);
+        uint shared_index = 0; // shared_index -> left mat col = right mat row
+        uint right_mat_step = static_cast<uint>(other._cols); // number of indices to skip to next row in column
+        uint right_mat_col; // current column number of right matrix (for inner loop)
+        double curr_sum = 0; // sum of current entry
+        for (uint i = 0; i < _matrix.size(); i += static_cast<uint>(_cols)) { // loop left matrix, i->skips to next row
+            right_mat_col = 0; // start from first column in right matrix
+            for (uint j = 0; j < other._matrix.size(); ++j) { // loop right matrix (multiply the ith row by all columns)
+                curr_sum += (_matrix[shared_index + i] * // i = start of current row + shared_index = current column
+                             // shared_index * right_mat_step = skip to the row below in the current column (right_mat_col)
+                             other._matrix[right_mat_col + (shared_index * right_mat_step)]);
+                ++shared_index; // increment to next value in left mat row / right mat column
+                if (shared_index == _cols) { // _cols == other._rows (finished current entry)
+                    shared_index = 0;
+                    mat_mul.push_back(curr_sum); // insert sum of entry
                     curr_sum = 0;
-                    ++curr_col;
+                    ++right_mat_col;
                 }
             }
         }
-        _matrix.swap(mat_mul);
+        _matrix.swap(mat_mul); // swaps the contents (addresses) of the vectors, avoids copying (swap is O(1))
+        // vector must be of the same data type, size can differ
         _cols = other._cols;
         return *this;
     }
 
 // friend functions
-
-    /*
-     * https://2019.cppconf-piter.ru/en/2019/spb/talks/45r2fxppvo0iabreclznd/
-     * https://www.codesynthesis.com/~boris/blog/2012/07/24/const-rvalue-references/#:~:text=Note%20the%20asymmetry%3A%20while%20a,const%20rvalue%20references%20pretty%20useless.
-     */
-    std::ostream &operator<<(std::ostream &out, const Matrix &matrix) {
-        double tmp = 0;
-        for (uint i = 0; i < matrix._rows; ++i) {
-            out << "[";
-            uint start_index = i * static_cast<uint>(matrix._cols);
-            uint end_of_row_index = start_index + static_cast<uint>(matrix._cols);
-            for (uint j = start_index; j < end_of_row_index; ++j) {
-                tmp = matrix._matrix[j] == 0 ? 0 : matrix._matrix[j];
-                out << tmp;
-                if (j < end_of_row_index - 1) {
-                    out << " ";
-                }
-            }
-            out << "]";
-            if (i < matrix._rows - 1) {
-                out << '\n';
-            }
-        }
-        return out;
-    }
-
-    void Matrix::cinSplitRows(const string &str_input, vector<string> &input_rows) {
-        std::regex extract_rows{R"(\,\s)"};
-        // passing -1 as the submatch index parameter performs splitting
-        std::sregex_token_iterator iter_start{str_input.begin(), str_input.end(), extract_rows, -1}, iter_end;
-        while (iter_start != iter_end) {
-            input_rows.push_back(iter_start->str());
-            ++iter_start;
-        }
-    }
-
-    int Matrix::cinColumnsCheck(vector<string> &input_rows) {
-        int prev_num_count = -1, num_count = 0;
-        for (string &row: input_rows) {
-            for (char &c: row) {
-                if (c == ' ') {
-                    ++num_count;
-                }
-            }
-            if (prev_num_count != -1 && num_count != prev_num_count) {
-                throw std::runtime_error("Invalid column dimensions!");
-            }
-            prev_num_count = num_count;
-            num_count = 0;
-        }
-        return prev_num_count;
-    }
-
-    // these websites were useful for testing the regex: https://www.regextester.com/97722, https://regex101.com/
-    void Matrix::cinRowsCheck(vector<string> &input_rows) {
-        std::regex check_rows{R"(\[(\-?\d+(\.\d+)?)(\s\-?\d+(\.\d+)?)*\])"};
-
-        for (const string &row: input_rows) {
-            if (!std::regex_match(row, check_rows)) {
-                throw std::runtime_error("Could not parse input!");
-            }
-        }
-    }
-
-    void Matrix::cinInsertNumbers(Matrix &matrix, vector<string> &input_rows) {
-        std::regex get_nums{R"(\s)"};
-        for (string &row: input_rows) {
-            std::sregex_token_iterator iter_start{row.begin() + 1, row.end() - 1, get_nums, -1}, iter_end;
-            while (iter_start != iter_end) {
-                matrix._matrix.push_back(std::stod(iter_start->str()));
-                ++iter_start;
-            }
-        }
-    }
-
-    std::istream &operator>>(std::istream &in, Matrix &matrix) {
-        matrix._matrix.clear();
-        matrix._rows = 0;
-        matrix._cols = 0;
-
-        string str_input;
-
-        in.ignore(); // todo: explain
-        getline(in, str_input);
-
-        vector<string> input_rows;
-
-        Matrix::cinSplitRows(str_input, input_rows);
-        int col_size = Matrix::cinColumnsCheck(input_rows);
-        Matrix::cinRowsCheck(input_rows);
-        Matrix::cinInsertNumbers(matrix, input_rows);
-
-        matrix._rows = static_cast<int>(input_rows.size());
-        matrix._cols = col_size;
-
-        if (matrix._matrix.empty() || matrix._matrix.size() != matrix._rows * matrix._cols) {
-            throw std::runtime_error("Could not parse input!");
-        }
-
-        return in;
-    }
-
 
     /**
      * friend function for scalar on left side
@@ -355,42 +262,155 @@ namespace zich {
         return res_matrix;
     }
 
+    /*
+     * https://2019.cppconf-piter.ru/en/2019/spb/talks/45r2fxppvo0iabreclznd/
+     * https://www.codesynthesis.com/~boris/blog/2012/07/24/const-rvalue-references/#:~:text=Note%20the%20asymmetry%3A%20while%20a,const%20rvalue%20references%20pretty%20useless.
+     */
+    /**
+     * Print matrix. Each row is in brackets and there is a newline in between rows.
+     */
+    std::ostream &operator<<(std::ostream &out, const Matrix &matrix) {
+        double curr_val;
+        for (uint i = 0; i < matrix._rows; ++i) { // loop rows
+            out << "[";
+            uint start_index = i * static_cast<uint>(matrix._cols); // start index of the ith row
+            uint end_of_row_index = start_index + static_cast<uint>(matrix._cols); // end of the ith row index
+            for (uint j = start_index; j < end_of_row_index; ++j) { // loop row according to indices calculated above
+                // floating point signbit could be negative and print -0 (even though 0 == -0)
+                curr_val = matrix._matrix[j] == 0 ? 0 : matrix._matrix[j];
+                out << curr_val;
+                if (j < end_of_row_index - 1) { // space in between numbers (not including first and last values)
+                    out << " ";
+                }
+            }
+            out << "]";
+            if (i < (matrix._rows - 1)) { // avoid newline after last row
+                out << '\n';
+            }
+        }
+        return out;
+    }
+
+    /**
+     * Parse user input into a matrix object.
+     * Valid format example: [1 0 0], [0 1 0], [0 0 1]
+     * @param matrix reference of matrix to parse input into
+     */
+    std::istream &operator>>(std::istream &in, Matrix &matrix) {
+        string str_input;
+        getline(in, str_input);
+
+        vector<double> new_mat;
+        vector<string> input_rows;
+
+        Matrix::cinSplitRows(str_input, input_rows); // if no exception was thrown: rows are valid
+        int col_size = Matrix::cinColumnsCheck(input_rows); // if no exception was thrown: columns are valid
+        Matrix::cinInsertNumbers(new_mat, input_rows); // if passed functions above: ready for parsing into matrix
+        int row_size = static_cast<int>(input_rows.size());
+
+        // check if parsing was successful
+        if (new_mat.empty() || new_mat.size() != row_size * col_size) {
+            throw std::runtime_error{"Error: Matrix size does not match dimensions after parsing!"};
+        }
+
+        matrix._matrix.swap(new_mat);
+        matrix._rows = row_size;
+        matrix._cols = col_size;
+
+        return in;
+    }
+
+
 // class methods and helper functions
+
+    /**
+        * Split input string by rows and insert into a vector.
+        */
+    void Matrix::cinSplitRows(const string &str_input, vector<string> &input_rows) {
+        std::regex extract_rows{R"(\,\s)"};
+        // passing -1 as the submatch index parameter performs splitting
+        std::sregex_token_iterator iter_start{str_input.begin(), str_input.end(), extract_rows, -1}, iter_end;
+        while (iter_start != iter_end) {
+            input_rows.push_back(iter_start->str());
+            ++iter_start;
+        }
+        Matrix::cinRowsCheck(input_rows); // call helper function
+    }
+
+    /**
+     * Check that each row is in the valid format.
+     */
+    void Matrix::cinRowsCheck(vector<string> &input_rows) {
+        // these websites were useful for testing the regex: https://www.regextester.com/97722, https://regex101.com/
+        std::regex check_rows{R"(\[(\-?\d+(\.\d+)?)(\s\-?\d+(\.\d+)?)*\])"};
+        for (const string &row: input_rows) {
+            if (!std::regex_match(row, check_rows)) {
+                throw std::runtime_error{"Could not parse input!"};
+            }
+        }
+    }
+
+    /**
+     * Check that user input rows have the same number of columns.
+     * @return number of columns
+     */
+    int Matrix::cinColumnsCheck(vector<string> &input_rows) {
+        int prev_num_count = -1, num_count = 1; // num_count starts from 1 (one value does not have spaces in between)
+        for (const string &row: input_rows) {
+            for (const char &c: row) {
+                if (c == ' ') {
+                    ++num_count;
+                }
+            }
+            if (prev_num_count != -1 && num_count != prev_num_count) { // check from second iteration
+                throw std::runtime_error{"Invalid column dimensions!"};
+            }
+            prev_num_count = num_count;
+            num_count = 1;
+        }
+        return prev_num_count; // return number of columns to update the matrix
+    }
+
+    /**
+     * Split input rows by spaces and append to the matrix vector.
+     */
+    void Matrix::cinInsertNumbers(vector<double> &new_mat, vector<string> &input_rows) {
+        std::regex get_nums{R"(\s)"};
+        for (string &row: input_rows) {
+            std::sregex_token_iterator iter_start{row.begin() + 1, row.end() - 1, get_nums, -1}, iter_end;
+            while (iter_start != iter_end) {
+                new_mat.push_back(std::stod(iter_start->str()));
+                ++iter_start;
+            }
+        }
+    }
 
     /**
      * Checks that the matrix has valid dimensions.
      * This is called in the constructors.
-     * @param mat_size
-     * @param rows
-     * @param cols
+     * @param mat_size vector size
      */
     void Matrix::checkInput(uint mat_size, int rows, int cols) {
         if (rows < 1 || cols < 1 || mat_size != (rows * cols)) {
-            throw std::invalid_argument("Invalid matrix size!");
+            throw std::invalid_argument{"Invalid matrix size!"};
         }
     }
 
     /**
      * Checks that the dimensions are valid for matrix multiplication.
-     * @param mat1_cols
-     * @param mat2_rows
      */
     void Matrix::checkDimensionsMul(int mat1_cols, int mat2_rows) {
         if (mat1_cols != mat2_rows) {
-            throw std::invalid_argument("Invalid dimensions for matrix multiplication!");
+            throw std::invalid_argument{"Invalid dimensions for matrix multiplication!"};
         }
     }
 
     /**
      * Checks that the dimensions are equal for addition, subtraction, and comparison operators.
-     * @param rows1
-     * @param cols1
-     * @param rows2
-     * @param cols2
      */
     void Matrix::checkDimensionsEq(int rows1, int cols1, int rows2, int cols2) {
         if (rows1 != rows2 || cols1 != cols2) {
-            throw std::invalid_argument("Invalid dimensions for matrix addition or subtraction!");
+            throw std::invalid_argument{"Invalid dimensions for matrix addition or subtraction!"};
         }
     }
 
